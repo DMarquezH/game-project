@@ -69,7 +69,7 @@ class PlayerCharacter(Character):
         self.climbing = False
         self.should_update_walk = 0
 
-    def update_animation(self, delta_time):
+    def update_animation(self, delta_time: float):
 
         # Figure out the direction the character is facing based on the movement
         # and previous direction.
@@ -395,15 +395,7 @@ class GameView(arcade.View):
         # Actually trigger animation updates. We've added the Background and Coins layer
         # here as well. Our Tiled map has some animated tiles built-in, check out the flags
         # and torches on the map.
-        self.scene.update_animation(
-            delta_time,
-            [
-                "Coins",
-                "Background",
-                "Player",
-                "Enemies"
-            ]
-        )
+        self.scene.update_animation(delta_time)
 
         self.scene.update(delta_time, ["Enemies", "Bullets"])
 
