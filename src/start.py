@@ -1,12 +1,22 @@
 import arcade
 
-from src.base.event import SimpleEvent
-from src.base.registry import Registry, DeferredRegistry
+from src.base.event import EventBus, Event
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
 WINDOW_TITLE = "survivor-project v0.1"
+
+EVENT_BUS = EventBus()
+
+
+class KeyPressedEvent(Event):
+
+    def __init__(self, symbol: int, modifiers: int):
+        super().__init__()
+
+        self.symbol = symbol
+        self.modifiers = modifiers
 
 
 class GameView(arcade.View):
@@ -17,21 +27,12 @@ class GameView(arcade.View):
     def on_show_view(self):
         print("GameView")
 
+    def on_key_press(self, symbol: int, modifiers: int) -> bool | None:
+        EVENT_BUS.dispatch(KeyPressedEvent(symbol, modifiers))
+
 
 def init():
-
-    item_reg = Registry[str]("items")
-    item_reg_def = DeferredRegistry[str](item_reg)
-
-    reg_event = SimpleEvent()
-    item_reg_def.set_register_event(reg_event)
-
-    item_reg_def.register("item_1", lambda: "Item 1")
-    item_reg_def.register("item_2", lambda: "Item 2")
-
-    reg_event.trigger()
-
-    print(item_reg.get("item_1"))
+    EVENT_BUS.subscribe(KeyPressedEvent, lambda e: print(f"Key pressed: {e.symbol}"))
 
 def main():
 

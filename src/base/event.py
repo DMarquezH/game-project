@@ -1,20 +1,51 @@
-from typing import Callable
+from dataclasses import dataclass
+from typing import Type, Callable, Dict, TypeVar, List, Tuple
+
+T = TypeVar("T", bound="Event")
 
 
-class SimpleEvent:
+class Event:
 
     def __init__(self):
-        self._listeners: set[Callable[[], None]] = set()
+        self._cancelled = False
 
-    def add_listener(self, callback: Callable[[], None]):
-        self._listeners.add(callback)
+    def cancel(self):
+        self._cancelled = True
 
-    def remove_listener(self, callback: Callable[[], None]):
-        self._listeners.discard(callback)
+    def is_cancelled(self) -> bool:
+        return self._cancelled
 
-    def trigger(self):
-        self._notify_listeners()
 
-    def _notify_listeners(self):
-        for listener in self._listeners:
-            listener()
+@dataclass
+class EventListener:
+    priority: int
+    callback: Callable[[Event], None]
+
+
+class EventBus:
+
+    def __init__(self):
+        self._listeners: Dict[Type[Event], List[EventListener]] = {}
+
+    def subscribe(self, event_type: Type[T], callback: Callable[[T], None], priority: int = 0):
+
+        listeners = self._listeners.setdefault(event_type, [])
+
+        listeners.append(EventListener(priority, callback))
+        listeners.sort(key=lambda lst: lst.priority, reverse=True)
+
+    def unsubscribe(self, event_type: Type[T], callback: Callable[[T], None]):
+
+        if event_type not in self._listeners: return
+
+        self._listeners[event_type] = [
+            lst for lst in self._listeners[event_type]
+            if lst.callback != callback
+        ]
+
+    def dispatch(self, event: T):
+
+        listeners = self._listeners.get(type(event), []).copy()
+
+        for listener in listeners:
+            listener.callback(event)
