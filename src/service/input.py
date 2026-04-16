@@ -1,4 +1,4 @@
-from typing import Callable, Set, ParamSpec, Generic, override
+from typing import Callable, Set, ParamSpec, Generic
 
 from src.base.event import Signal
 from src.base.registry import Registry
@@ -11,6 +11,8 @@ class InputAction(Generic[P]):
 
     def __init__(self, key: str, context: str):
         self.key = key
+        self.context = context
+
         self._signal = Signal[P]()
 
     def add_listener(self, callback: Callable[P, None]):
@@ -18,6 +20,9 @@ class InputAction(Generic[P]):
 
     def remove_listener(self, callback: Callable[P, None]):
         self._signal.disconnect(callback)
+
+    def trigger(self, *args: P.args):
+        self._signal.emit(*args)
 
 
 class InputContexts:
@@ -46,21 +51,15 @@ class InputService:
         self._action_registry = Registry[InputAction]("base")
         self._active_inputs: Set[int] = set()
 
-    def init(self):
         self._register_actions()
 
     def _register_actions(self):
 
-        self.reg_action(InputActions.PLAYER_MOVE)
-        self.reg_action(InputActions.PLAYER_INTERACT)
-        self.reg_action(InputActions.PLAYER_ATTACK)
-
-        self.reg_action(InputActions.TOGGLE_PAUSE)
+        for action in vars(InputActions).values():
+            if isinstance(action, InputAction):
+                self._action_registry.register(action.key, action)
 
         self._action_registry.freeze()
-
-    def reg_action(self, action: InputAction):
-        self._action_registry.register(action.key, action)
 
     def register_input(self, input_: int):
         self._active_inputs.add(input_)
