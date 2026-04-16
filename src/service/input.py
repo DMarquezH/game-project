@@ -1,5 +1,6 @@
-from typing import Callable, Set, ParamSpec, Generic
+from typing import Callable, Set, ParamSpec, Generic, Dict
 
+from base.registry import RegistryException
 from src.base.event import Signal
 from src.base.registry import Registry
 from src.service.geometry import Vector2
@@ -9,10 +10,8 @@ P = ParamSpec("P")
 
 class InputAction(Generic[P]):
 
-    def __init__(self, key: str, context: str):
+    def __init__(self, key: str):
         self.key = key
-        self.context = context
-
         self._signal = Signal[P]()
 
     def add_listener(self, callback: Callable[P, None]):
@@ -25,41 +24,78 @@ class InputAction(Generic[P]):
         self._signal.emit(*args)
 
 
+class InputContext:
+
+    def __init__(self, key: str):
+        self.key = key
+        self._actions: Dict[str, InputAction] = {}
+        self._frozen = False
+
+    def register(self, action: InputAction[P]) -> InputAction[P]:
+
+        if self._frozen:
+            raise RegistryException(f"No further input actions allowed to be registered! ")
+
+        if self.contains(action):
+            raise RegistryException(f"Action '{action.key}' already registered in context '{self.key}'")
+
+        self._actions[action.key] = action
+        return action
+
+    def get_all(self) -> Set[InputAction]:
+        return set(self._actions.values())
+
+    def contains(self, action: InputAction) -> bool:
+        return action.key in self._actions
+
+    def freeze(self):
+        self._frozen = True
+
+    def is_frozen(self) -> bool:
+        return self._frozen
+
+
 class InputContexts:
-    DEFAULT = "default"
-    GENERAL = "gameplay"
-    GAMEPLAY = "gameplay"
-    MENU = "menu"
+    DEFAULT = InputContext("default")
+    GENERAL = InputContext("general")
+    GAMEPLAY = InputContext("gameplay")
+    MENU = InputContext("menu")
 
 
 class InputActions:
 
-    TOGGLE_PAUSE = InputAction[[]]("toggle_pause", InputContexts.GENERAL)
+    TOGGLE_PAUSE = InputContexts.GENERAL.register(InputAction[[]]("toggle_pause"))
 
-    PLAYER_MOVE = InputAction[Vector2]("player_move", InputContexts.GAMEPLAY)
-    PLAYER_INTERACT = InputAction[[]]("player_interact", InputContexts.GAMEPLAY)
-    PLAYER_ATTACK = InputAction[[]]("player_attack", InputContexts.GAMEPLAY)
+    PLAYER_MOVE = InputContexts.GENERAL.register(InputAction[Vector2]("player_move"))
+    PLAYER_INTERACT = InputContexts.GENERAL.register(InputAction[[]]("player_interact"))
+    PLAYER_ATTACK = InputContexts.GENERAL.register(InputAction[[]]("player_attack"))
 
-    MENU_MOVE = InputAction[[Vector2]]("menu_move", InputContexts.MENU)
-    MENU_SELECT = InputAction[[]]("menu_select", InputContexts.MENU)
-    MENU_BACK = InputAction[[]]("menu_back", InputContexts.MENU)
+    MENU_MOVE = InputContexts.GENERAL.register(InputAction[[Vector2]]("menu_move"))
+    MENU_SELECT = InputContexts.GENERAL.register(InputAction[[]]("menu_select"))
+    MENU_BACK = InputContexts.GENERAL.register(InputAction[[]]("menu_back"))
 
 
 class InputService:
 
     def __init__(self):
-        self._action_registry = Registry[InputAction]("base")
+        self._context_registry = Registry[InputContext]("base")
         self._active_inputs: Set[int] = set()
 
-        self._register_actions()
+    def init(self):
+        self._register_contexts()
+        self._freeze_contexts()
 
-    def _register_actions(self):
+    def _register_contexts(self):
+        for context in vars(InputContexts).values():
+            if isinstance(context, InputContext):
+                self._context_registry.register(context.key, context)
 
-        for action in vars(InputActions).values():
-            if isinstance(action, InputAction):
-                self._action_registry.register(action.key, action)
+    def _freeze_contexts(self):
+        for context in self.registered_contexts():
+            context.freeze()
 
-        self._action_registry.freeze()
+    def registered_contexts(self) -> Set[InputContext]:
+        return set(self._context_registry.get_all().values())
 
     def register_input(self, input_: int):
         self._active_inputs.add(input_)
