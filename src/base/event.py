@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import Type, Callable, Dict, TypeVar, List, Tuple
+from typing import Type, Callable, Dict, TypeVar, List, ParamSpec, Generic, Set
 
 T = TypeVar("T", bound="Event")
+P = ParamSpec("P")
 
 
 class Event:
@@ -49,3 +50,35 @@ class EventBus:
 
         for listener in listeners:
             listener.callback(event)
+
+
+class Signal(Generic[P]):
+    """
+    Representa un evento local que envia argumentos definidos en P a los recibidores, cuando este es activado.
+    """
+
+    def __init__(self):
+        self._receivers: Set[Callable[P, None]] = set()
+
+    def connect(self, callback: Callable[P, None]):
+        """
+        Registra una función recibidora en el evento.
+        :param callback: Función que recibe argumentos P y devuelve None.
+        """
+        self._receivers.add(callback)
+
+    def disconnect(self, callback: Callable[P, None]):
+        """
+        Elimina una función recibidora registrada en el evento. AVISO: Si la función que se registró fue definida
+        como lambda, no podrá ser eliminada.
+
+        :param callback: Función que recibe argumentos P y devuelve None, ya registrada en el evento.
+        """
+        self._receivers.discard(callback)
+
+    def emit(self, *args: P.args):
+        """
+        Envía argumentos P a todas las funciones recibidoras registradas.
+        """
+        for listener in self._receivers.copy():
+            listener(*args)

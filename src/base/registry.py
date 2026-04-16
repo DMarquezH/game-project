@@ -4,13 +4,19 @@ T = TypeVar("T")
 
 
 class RegistryException(Exception):
+    """
+    Excepción lanzada por errores relacionados con acciones de registro.
+    """
     pass
 
 
 class Registry(Generic[T]):
+    """
+    Representa una colección de objetos genéricos T, identificados por una clave.
+    """
 
-    def __init__(self, name: str):
-        self.name = name
+    def __init__(self, namespace: str):
+        self.namespace = namespace
         self._entries: dict[str, T] = dict()
         self._frozen = False
 
@@ -57,12 +63,27 @@ class RegistryObject(Generic[T]):
 
 
 class DeferredRegistry(Generic[T]):
+    """
+    Representa un registro diferido de objetos genéricos T.
+
+    Su función principal es preparar un registro (Registry[T]), posponiendo el registro de los objetos al
+    momento de la ejecucion de DeferredRegistry.build(). De esta manera, es posible organizar los registros
+    de objetos de uso global de forma ordenada, estableciendo prioridades, si procede.
+
+    Utiliza carga perezosa mediante suppliers para la preparación de los registros de los objetos.
+    """
 
     def __init__(self, registry: Registry[T]):
         self._registry = registry
         self._entries: dict[str, RegistryObject[T]] = dict()
 
     def register(self, key: str, supplier: Callable[[], T]) -> RegistryObject[T]:
+        """
+        Deja en preparación el registro de un objeto.
+
+        :param key: clave identificativa del objeto.
+        :param supplier: Supplier del objeto a registrar.
+        """
 
         if key in self._entries:
             raise RegistryException(f"Key ({key}) is already registered!")
@@ -73,5 +94,9 @@ class DeferredRegistry(Generic[T]):
         return reg_obj
 
     def build(self):
+        """
+        Ejecuta el registro en el Registry[T] de todos los objetos definidos.
+        """
+
         for reg_obj in self._entries.values():
             self._registry.register(reg_obj.key, reg_obj.instance())
