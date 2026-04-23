@@ -69,7 +69,6 @@ class MyGame(arcade.Window):
         self.clear()
         self.scene.draw()
 
-    # --- AÑADE ESTAS TRES FUNCIONES NUEVAS AQUÍ ---
 
     def on_update(self, delta_time):
         """ Lógica y movimiento. Se ejecuta 60 veces por segundo """
