@@ -2,8 +2,6 @@ import arcade
 from pathlib import Path
 
 # --- CONFIGURACIÓN DE RUTAS (PROYECTO PRINCIPAL) ---
-# El archivo está en: assets/maps/mapaprueba.py
-# Subimos un nivel para llegar a la carpeta principal 'assets'
 CURRENT_DIR = Path(__file__).parent.resolve()
 ASSETS_PATH = CURRENT_DIR.parent 
 
