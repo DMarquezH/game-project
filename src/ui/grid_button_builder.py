@@ -1,0 +1,39 @@
+import arcade
+import arcade.gui
+import ui.base_button
+
+class GridButtons(arcade.gui.UIAnchorLayout):
+    """
+    UI layout component that organizes the main menu buttons
+
+    Args:
+        * button_list (list[dict]): list of buttons with dictionaries with its characteristics:
+            -"sheet"(str): path to the spritesheet with the 2 different styles ([0]->Normal, [1]->Hovered)
+            -"action"(callback): Function executable when the button is pressed
+            -"width"(int): width of a single image of the sheet button
+            -"height"(int): height of a single image of the sheet button
+            -"columns"(int): number of columns of sheet button
+            -"count"(int): number of images of sheet button (Only 2 are going to be considered)
+        * "space_between"(int): spaces between buttons [Default=0]
+        * "position_x"(str): Screen location x -> "center","left","right" [Default="center"]
+        * "position_y"(str): Screen location y ->"center","bottom","top" [Default="center"]
+
+
+    """
+    def __init__(self, button_list:list[dict], space_between:int=0, position_x="center", position_y="center"):
+        super().__init__()
+        box_layout = arcade.gui.UIBoxLayout(space_between=space_between)
+
+        for button in button_list:
+            boton = ui.base_button.BaseButton(
+                sheet=button["sheet"],
+                action=button["action"],
+                # If not value, set 0
+                image_width=button.get("width",0),
+                image_height=button.get("height",0),
+                columns=button.get("columns",0),
+                count=button.get("count",0)
+            )
+            box_layout.add(boton)
+
+        self.add(child=box_layout,anchor_x=position_x,anchor_y=position_y,)
