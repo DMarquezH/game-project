@@ -10,6 +10,18 @@ class RegistryException(Exception):
     pass
 
 
+class Freezable:
+
+    def __init__(self):
+        self._frozen = False
+
+    def is_frozen(self) -> bool:
+        return self._frozen
+
+    def freeze(self):
+        self._frozen = True
+
+
 class Registry(Generic[T]):
     """
     Representa una colección de objetos genéricos T, identificados por una clave.

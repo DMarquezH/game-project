@@ -1,7 +1,7 @@
 import arcade
 
 
-class Entity(arcade.Sprite):
+class BaseEntity(arcade.Sprite):
 
     def __init__(self):
         super().__init__()

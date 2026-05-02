@@ -218,7 +218,7 @@ class GameView(arcade.View):
         # This variable will store the text for score that we will draw to the screen.
         self.score_text = None
 
-        # Where is the right edge of the map?
+        # Where is the right edge of the level?
         self.end_of_map = 0
 
         # Should we reset the score?
@@ -326,7 +326,7 @@ class GameView(arcade.View):
 
         self.background_color = arcade.csscolor.CORNFLOWER_BLUE
 
-        # Calculate the right edge of the map in pixels
+        # Calculate the right edge of the level in pixels
         self.end_of_map = (self.tile_map.width * self.tile_map.tile_width)
         self.end_of_map *= self.tile_map.scaling
 
@@ -393,8 +393,8 @@ class GameView(arcade.View):
 
 
         # Actually trigger animation updates. We've added the Background and Coins layer
-        # here as well. Our Tiled map has some animated tiles built-in, check out the flags
-        # and torches on the map.
+        # here as well. Our Tiled level has some animated tiles built-in, check out the flags
+        # and torches on the level.
         self.scene.update_animation(delta_time)
 
         self.scene.update(delta_time, ["Enemies", "Bullets"])
@@ -431,7 +431,7 @@ class GameView(arcade.View):
 
                 return
 
-            # Remove bullet if it leaves the map area.
+            # Remove bullet if it leaves the level area.
             # Bullets only travel horizontally, so we only need to check left and right.
             if (bullet.right < 0) or (bullet.left > self.end_of_map):
                 bullet.remove_from_sprite_lists()

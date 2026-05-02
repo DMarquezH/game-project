@@ -1,9 +1,9 @@
 from typing import Callable, Set, ParamSpec, Generic, Dict
 
-from base.registry import RegistryException
-from src.base.event import Signal
-from src.base.registry import Registry
-from src.service.geometry import Vector2
+from src.core.registry import RegistryException
+from src.core.event import Signal
+from src.core.registry import Registry
+from src.utils.geometry import Vector2
 
 P = ParamSpec("P")
 
@@ -59,7 +59,7 @@ class InputContexts:
     DEFAULT = InputContext("default")
     GENERAL = InputContext("general")
     GAMEPLAY = InputContext("gameplay")
-    MENU = InputContext("menu")
+    MENU = InputContext("menus")
 
 
 class InputActions:
@@ -78,7 +78,7 @@ class InputActions:
 class InputService:
 
     def __init__(self):
-        self._context_registry = Registry[InputContext]("base")
+        self._context_registry = Registry[InputContext]("core")
         self._active_inputs: Set[int] = set()
 
     def init(self):

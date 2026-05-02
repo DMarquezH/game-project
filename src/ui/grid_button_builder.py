@@ -1,10 +1,12 @@
 import arcade
 import arcade.gui
-import ui.base_button
+
+from src.ui.widgets.base_button import BaseButton
+
 
 class GridButtons(arcade.gui.UIAnchorLayout):
     """
-    UI layout component that organizes the main menu buttons
+    UI layout component that organizes the main menus buttons
 
     Args:
         * button_list (list[dict]): list of buttons with dictionaries with its characteristics:
@@ -25,7 +27,7 @@ class GridButtons(arcade.gui.UIAnchorLayout):
         box_layout = arcade.gui.UIBoxLayout(space_between=space_between)
 
         for button in button_list:
-            boton = ui.base_button.BaseButton(
+            boton = BaseButton(
                 sheet=button["sheet"],
                 action=button["action"],
                 # If not value, set 0

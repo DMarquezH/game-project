@@ -23,8 +23,8 @@ class MyGame(arcade.Window):
 
         # Cargamos las imágenes (apuntan correctamente dentro del propio proyecto)
         player_img = (ASSETS_PATH / "sprites" / "entity" / "player_48.png").resolve()
-        floor_img = (ASSETS_PATH / "textures" / "map" / "floor_64.png").resolve()
-        rock_img = (ASSETS_PATH / "textures" / "map" / "rock_32.png").resolve()
+        floor_img = (ASSETS_PATH / "textures" / "level" / "floor_64.png").resolve()
+        rock_img = (ASSETS_PATH / "textures" / "level" / "rock_32.png").resolve()
         enemy_img = (ASSETS_PATH / "sprites" / "entity" / "enemy_32.png").resolve()
 
         # 1. SUELO: Rellenamos la ventana y el espacio extra
