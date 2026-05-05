@@ -13,7 +13,6 @@ class World:
         self.scene: Scene | None = None
         self.player: Sprite | None = None
         self.physics: PhysicsEngineSimple | None = None
-        self.camera: Camera2D | None = None
 
         self.init()
 
@@ -54,25 +53,15 @@ class World:
 
         self.physics = PhysicsEngineSimple(self.player, self.scene["trees"])
 
-        ### Camera ###
-
-        self.camera = Camera2D()
-
     def draw(self):
-        self.camera.use()
         self.scene.draw()
 
     def update(self):
         self.physics.update()
-        self.update_cam_pos()
 
     def move_player(self, move_dir: Vec2):
         self.player.change_x = 5 * move_dir.x
         self.player.change_y = 5 * move_dir.y
 
-    def update_cam_pos(self):
-
-        target = self.player.position
-        current = self.camera.position
-
-        self.camera.position = current.lerp(target, 0.1)
+    def player_attack(self, attack_dir: Vec2):
+        pass

@@ -1,10 +1,9 @@
-from pathlib import Path
-
 import arcade
 from arcade.gui import UIManager
 
 from src.core.display import BaseView
 from src.services.navigation import NavigationService
+from src.settings.game_resources import GameResources
 from src.ui.grid_button_builder import GridButtons
 from src.views.game_view import GameView
 
@@ -19,7 +18,7 @@ class MainMenuView(BaseView):
 
         self.ui = UIManager()
 
-        menu_textures: Path = arcade.resources.resolve(":textures:") / "ui" / "menus"
+        menu_textures = GameResources.get("textures") / "ui" / "menus"
 
         self.button_data = [
             {

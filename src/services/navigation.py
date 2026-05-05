@@ -43,10 +43,10 @@ class NavigationService(Service):
 
     def _resolve_services(self, view_type: Type[V]) -> V:
 
-        signature = inspect.signature(view_type.__init__)
+        view_constructor = inspect.signature(view_type.__init__)
         kwargs = {}
 
-        for name, param in signature.parameters.items():
+        for name, param in view_constructor.parameters.items():
 
             if name == "self":
                 continue
@@ -56,7 +56,7 @@ class NavigationService(Service):
             if param_type is inspect.Parameter.empty:
 
                 raise RegistryException(
-                    f"Parameter '{name}' in {view_type.__name__} has no type annotation"
+                    f"Parameter '{name}' in {view_type.__name__} has no type annotation!"
                 )
 
             service = self._window.service_container.get(param_type)
