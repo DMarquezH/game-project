@@ -5,8 +5,8 @@ from src.core.display import BaseView
 from src.services.input_service import InputService
 from src.services.navigation import NavigationService
 from src.settings.game_resources import GameResources
+from src.settings.game_views import Views
 from src.ui.grid_button_builder import GridButtons
-from src.views.game_view import GameView
 
 
 class MainMenuView(BaseView):
@@ -24,7 +24,7 @@ class MainMenuView(BaseView):
         self.button_data = [
             {
                 "sheet": menu_textures / "button_jugar_spritesheet.png",
-                "action": lambda: nav_service.navigate(GameView),
+                "action": lambda: nav_service.navigate(Views.GAME),
                 "width": 300,
                 "height": 138,
                 "columns": 2,

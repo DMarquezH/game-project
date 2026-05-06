@@ -1,8 +1,8 @@
 import arcade
 from arcade import Scene, PhysicsEngineSimple, Sprite
 
-from src.core.event.event_service import EventBus
-from src.core.registry import Registry
+from services.event_service import EventBus
+from src.core.registry import TypeRegistry
 from src.entities.player_entity import Player
 from src.settings.game_constants import GameConstants
 from src.settings.game_resources import GameResources
@@ -15,7 +15,7 @@ class World:
 
         self.event_bus = event_bus
 
-        self.systems = Registry()
+        self.systems = TypeRegistry()
 
         self.scene: Scene | None = None
         self.player: Player | None = None

@@ -3,12 +3,13 @@ from arcade import Camera2D
 from pyglet.math import Vec2
 
 from src.core.display import BaseView, GameCamera
-from src.core.event.event_service import EventBus
+from src.services.event_service import EventBus
 
 from src.services.input_service import InputService
 from src.services.navigation import NavigationService
 
 from src.world.world import World
+from src.ui.TestUI import TestUI
 
 
 class GameView(BaseView):
@@ -18,6 +19,9 @@ class GameView(BaseView):
 
         self.event_bus = event_bus
         self.nav_service = nav_service
+
+        # Temp
+        self.test_ui = TestUI(nav_service)
 
         self.active_keyboard_inputs = set()
         self.world = World(event_bus)

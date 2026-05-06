@@ -22,7 +22,7 @@ class Freezable:
         self._frozen = True
 
 
-class Registry(Freezable):
+class TypeRegistry(Generic[T], Freezable):
 
     def __init__(self):
         super().__init__()
@@ -34,22 +34,21 @@ class Registry(Freezable):
     def get(self, obj_type: Type[T]) -> T:
         return self._entries.get(obj_type)
 
-    def get_all(self) -> Dict[Type[T], T]:
+    def get_all(self) -> Dict[Type, T]:
         return self._entries.copy()
 
     def contains(self, obj_type: Type[T]) -> bool:
         return obj_type in self._entries
 
 
-class RegistryOld(Generic[T]):
+class Registry(Generic[T], Freezable):
     """
     Representa una colección de objetos genéricos T, identificados por una clave.
     """
 
-    def __init__(self, namespace: str):
-        self.namespace = namespace
+    def __init__(self):
+        super().__init__()
         self._entries: dict[str, T] = dict()
-        self._frozen = False
 
     def register(self, key: str, obj: T) -> T:
 
@@ -70,12 +69,6 @@ class RegistryOld(Generic[T]):
 
     def contains(self, key: str):
         return key in self._entries
-
-    def freeze(self):
-        self._frozen = True
-
-    def is_frozen(self) -> bool:
-        return self._frozen
 
 
 class RegistryObject(Generic[T]):
@@ -104,7 +97,7 @@ class DeferredRegistry(Generic[T]):
     Utiliza carga perezosa mediante suppliers para la preparación de los registros de los objetos.
     """
 
-    def __init__(self, registry: RegistryOld[T]):
+    def __init__(self, registry: Registry[T]):
         self._registry = registry
         self._entries: dict[str, RegistryObject[T]] = dict()
 

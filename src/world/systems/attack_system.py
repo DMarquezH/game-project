@@ -1,5 +1,5 @@
-from src.core.event.event_service import EventBus
-from src.core.event.game_events import PlayerAttackedMeleeEvent
+from services.event_service import EventBus
+from settings.game_events import PlayerAttackedMeleeEvent
 
 
 class AttackSystem:

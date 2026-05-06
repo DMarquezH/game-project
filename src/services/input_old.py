@@ -1,8 +1,8 @@
 from typing import Callable, Set, ParamSpec, Generic, Dict
 
 from src.core.registry import RegistryException
-from src.core.event.event_service import Signal
-from src.core.registry import Registry
+from services.event_service import Signal
+from src.core.registry import TypeRegistry
 from src.utils.geometry import Vector2
 
 P = ParamSpec("P")
@@ -78,7 +78,7 @@ class InputActions:
 class InputService:
 
     def __init__(self):
-        self._context_registry = Registry[InputContext]("core")
+        self._context_registry = TypeRegistry[InputContext]("core")
         self._active_inputs: Set[int] = set()
 
     def init(self):

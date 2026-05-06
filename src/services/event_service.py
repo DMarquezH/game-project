@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Type, Callable, Dict, TypeVar, List, ParamSpec, Generic, Set
 
+from core.service_container import Service
+
 T = TypeVar("T", bound="BaseEvent")
 P = ParamSpec("P")
 
@@ -23,9 +25,10 @@ class EventListener:
     callback: Callable[[BaseEvent], None]
 
 
-class EventBus:
+class EventBus(Service):
 
     def __init__(self):
+        super().__init__("event-bus")
         self._listeners: Dict[Type[BaseEvent], List[EventListener]] = {}
 
     def subscribe(self, event_type: Type[T], callback: Callable[[T], None], priority: int = 0):

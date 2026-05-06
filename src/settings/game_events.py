@@ -1,6 +1,6 @@
 from pyglet.math import Vec2
 
-from src.core.event.event_service import BaseEvent
+from services.event_service import BaseEvent
 
 
 class PlayerAttackedMeleeEvent(BaseEvent):
