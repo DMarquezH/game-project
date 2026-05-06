@@ -1,22 +1,33 @@
 import arcade
-from arcade import Scene, Sprite, PhysicsEngineSimple, Camera2D
-from pyglet.math import Vec2
+from arcade import Scene, PhysicsEngineSimple, Sprite
 
+from src.core.event.event_service import EventBus
+from src.core.registry import Registry
+from src.entities.player_entity import Player
 from src.settings.game_constants import GameConstants
 from src.settings.game_resources import GameResources
+from src.world.systems.attack_system import AttackSystem
 
 
 class World:
 
-    def __init__(self):
+    def __init__(self, event_bus: EventBus):
+
+        self.event_bus = event_bus
+
+        self.systems = Registry()
 
         self.scene: Scene | None = None
-        self.player: Sprite | None = None
+        self.player: Player | None = None
         self.physics: PhysicsEngineSimple | None = None
 
         self.init()
 
     def init(self):
+
+        ### Systems ###
+
+        self.systems.register(AttackSystem(self.event_bus))
 
         ### Tilemap ###
 
@@ -44,7 +55,7 @@ class World:
             GameResources.get("textures") / "entity" / "player_highres.png"
         )
 
-        self.player = arcade.Sprite(player_texture, 0.125)
+        self.player = Player(self.event_bus, player_texture, 0.125)
         self.player.position = (GameConstants.WINDOW_WIDTH / 2, GameConstants.WINDOW_HEIGHT / 2)
 
         self.scene.add_sprite("player", self.player)
@@ -59,9 +70,5 @@ class World:
     def update(self):
         self.physics.update()
 
-    def move_player(self, move_dir: Vec2):
-        self.player.change_x = 5 * move_dir.x
-        self.player.change_y = 5 * move_dir.y
-
-    def player_attack(self, attack_dir: Vec2):
+    def add_entity(self, entity: Sprite):
         pass

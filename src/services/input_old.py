@@ -1,7 +1,7 @@
 from typing import Callable, Set, ParamSpec, Generic, Dict
 
 from src.core.registry import RegistryException
-from src.core.event import Signal
+from src.core.event.event_service import Signal
 from src.core.registry import Registry
 from src.utils.geometry import Vector2
 

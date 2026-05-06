@@ -1,7 +1,9 @@
 import arcade
 
 from src.core.display import BaseWindow
+from src.core.event.event_service import EventBus
 from src.core.service_container import ServiceContainer
+from src.services.input_service import InputService
 from src.services.navigation import NavigationService
 from src.settings.game_constants import GameConstants
 from src.settings.game_resources import GameResources
@@ -26,6 +28,9 @@ class MainWindow(BaseWindow):
         if self.service_container.is_frozen(): return
 
         self.service_container.register(NavigationService(self))
+        self.service_container.register(EventBus())
+        self.service_container.register(InputService())
+
         self.service_container.freeze()
 
 

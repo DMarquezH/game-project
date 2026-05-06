@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Callable
+from typing import Generic, TypeVar, Callable, Dict, Type, Any
 
 T = TypeVar("T")
 
@@ -22,7 +22,26 @@ class Freezable:
         self._frozen = True
 
 
-class Registry(Generic[T]):
+class Registry(Freezable):
+
+    def __init__(self):
+        super().__init__()
+        self._entries: Dict[Type[Any], Any] = {}
+
+    def register(self, instance: T):
+        self._entries[type(instance)] = instance
+
+    def get(self, obj_type: Type[T]) -> T:
+        return self._entries.get(obj_type)
+
+    def get_all(self) -> Dict[Type[T], T]:
+        return self._entries.copy()
+
+    def contains(self, obj_type: Type[T]) -> bool:
+        return obj_type in self._entries
+
+
+class RegistryOld(Generic[T]):
     """
     Representa una colección de objetos genéricos T, identificados por una clave.
     """
@@ -85,7 +104,7 @@ class DeferredRegistry(Generic[T]):
     Utiliza carga perezosa mediante suppliers para la preparación de los registros de los objetos.
     """
 
-    def __init__(self, registry: Registry[T]):
+    def __init__(self, registry: RegistryOld[T]):
         self._registry = registry
         self._entries: dict[str, RegistryObject[T]] = dict()
 

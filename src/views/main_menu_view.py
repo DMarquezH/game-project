@@ -2,6 +2,7 @@ import arcade
 from arcade.gui import UIManager
 
 from src.core.display import BaseView
+from src.services.input_service import InputService
 from src.services.navigation import NavigationService
 from src.settings.game_resources import GameResources
 from src.ui.grid_button_builder import GridButtons
@@ -13,8 +14,8 @@ class MainMenuView(BaseView):
     Main menus containing background and main buttons
     """
 
-    def __init__(self, nav_service: NavigationService):
-        super().__init__()
+    def __init__(self, input_service: InputService, nav_service: NavigationService):
+        super().__init__(input_service)
 
         self.ui = UIManager()
 
