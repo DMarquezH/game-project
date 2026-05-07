@@ -1,14 +1,12 @@
-from enum import Enum, auto
-
 from src.input.game_input import GameInput, InputAction
 from src.input.input_type import Axis, AxisMotion, MouseButton, MouseScroll, MouseDrag
 
 
-class MouseInputSource(Enum):
-    BUTTON = auto()
-    WHEEL = auto()
-    MOTION = auto()
-    DRAG = auto()
+class MouseInputSource:
+    BUTTON = "button"
+    WHEEL = "wheel"
+    MOTION = "motion"
+    DRAG = "drag"
 
 
 class MouseInput:

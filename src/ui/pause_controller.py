@@ -1,4 +1,3 @@
-from settings.game_views import Views
 from src.settings.game_resources import GameResources
 from src.ui.grid_button_builder import GridButtons
 from src.ui.base_gui_controller import BaseGuiController
@@ -8,7 +7,7 @@ from src.settings.game_views import Views
 class PauseController(BaseGuiController):
     def __init__(self,view):
         super().__init__()
-        self.isEnabled = False
+        self.enabled = False
         self.current_view = view
 
         menu_textures = GameResources.get("textures") / "ui" / "menus"
@@ -49,15 +48,14 @@ class PauseController(BaseGuiController):
 
     def enable(self):
         super().enable()
-        self.isEnabled = True
+        self.enabled = True
 
     def disable(self):
         super().disable()
-        self.isEnabled = False
+        self.enabled = False
 
-    def get_status(self):
-        return self.isEnabled
+    def is_enabled(self):
+        return self.enabled
 
 def unpause(view):
-    view.world.unfreeze()
     view.pause_menu.disable()

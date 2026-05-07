@@ -1,12 +1,13 @@
 import arcade
-from arcade import Scene, PhysicsEngineSimple, Sprite
+from arcade import Scene, PhysicsEngineSimple
 
-from services.event_service import EventBus
+from src.services.event_service import EventBus
 from src.core.registry import TypeRegistry
 from src.entities.player_entity import Player
 from src.settings.game_constants import GameConstants
 from src.settings.game_resources import GameResources
 from src.world.systems.attack_system import AttackSystem
+from src.world.systems.base_system import BaseSystem
 
 
 class World:
@@ -15,10 +16,7 @@ class World:
 
         self.event_bus = event_bus
 
-        self.systems = TypeRegistry()
-
-        # A falta de implementar enemigos para parar su movimiento
-        self.is_freeze = False
+        self.systems = TypeRegistry[BaseSystem]()
 
         self.scene: Scene | None = None
         self.player: Player | None = None
@@ -31,6 +29,9 @@ class World:
         ### Systems ###
 
         self.systems.register(AttackSystem(self.event_bus))
+
+        for system in self.systems.get_all().values():
+            system.init()
 
         ### Tilemap ###
 
@@ -59,7 +60,7 @@ class World:
         )
 
         self.player = Player(self.event_bus, player_texture, 0.125)
-        self.player.position = (GameConstants.WINDOW_WIDTH / 2, GameConstants.WINDOW_HEIGHT / 2)
+        self.player.position = (0, 0)
 
         self.scene.add_sprite("player", self.player)
 
@@ -69,16 +70,7 @@ class World:
 
     def draw(self):
         self.scene.draw()
+        self.scene.draw_hit_boxes(arcade.color.RED, 3)
 
     def update(self):
-        if not self.is_freeze:
-            self.physics.update()
-
-    def freeze(self):
-        self.is_freeze = True
-
-    def unfreeze(self):
-        self.is_freeze = False
-
-    def add_entity(self, entity: Sprite):
-        pass
+        self.physics.update()

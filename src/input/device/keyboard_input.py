@@ -1,10 +1,8 @@
-from enum import Enum, auto
-
 from src.input.game_input import GameInput, InputAction
 
 
-class KeyboardInputSource(Enum):
-    KEY = auto()
+class KeyboardInputSource:
+    KEY = "key"
 
 
 class KeyboardInput:

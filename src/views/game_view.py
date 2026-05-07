@@ -21,6 +21,7 @@ class GameView(BaseView):
 
         self.event_bus = event_bus
         self.nav_service = nav_service
+
         self.active_keyboard_inputs = set()
         self.world = World(event_bus)
         self.hud = HudController()
@@ -33,6 +34,7 @@ class GameView(BaseView):
     def on_show_view(self):
         self.background_color = arcade.color.BLACK
         self.hud.enable()
+
     def on_hide_view(self):
         self.hud.disable()
 
@@ -45,17 +47,17 @@ class GameView(BaseView):
         self.ui_camera.use()
         self.hud.draw()
 
-        if self.pause_menu.get_status():
+        if self.pause_menu.is_enabled():
             self.pause_menu.draw()
 
     def on_update(self, delta_time: float) -> bool | None:
         self.check_inputs()
-        self.world.update()
+        if not self.pause_menu.is_enabled(): self.world.update()
 
         self.world_camera.update(delta_time)
 
     def check_inputs(self):
-        if not self.pause_menu.get_status():
+        if not self.pause_menu.is_enabled():
             self.check_player_movement()
         self.check_pause()
 
@@ -78,7 +80,6 @@ class GameView(BaseView):
     def check_pause(self):
         if arcade.key.ESCAPE in self.active_keyboard_inputs:
             self.pause_menu.enable()
-            self.world.freeze()
 
     def on_key_press(self, symbol: int, modifiers: int):
         super().on_key_press(symbol, modifiers)
@@ -87,3 +88,11 @@ class GameView(BaseView):
     def on_key_release(self, symbol: int, modifiers: int):
         super().on_key_release(symbol, modifiers)
         self.active_keyboard_inputs.discard(symbol)
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        super().on_mouse_press(x, y, button, modifiers)
+
+        in_world_coords = self.world_camera.cam.unproject((x, y)).xy
+
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            self.world.player.attack_melee(in_world_coords)

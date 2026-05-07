@@ -26,7 +26,7 @@ class TypeRegistry(Generic[T], Freezable):
 
     def __init__(self):
         super().__init__()
-        self._entries: Dict[Type[Any], Any] = {}
+        self._entries: Dict[Type[T], T] = {}
 
     def register(self, instance: T):
         self._entries[type(instance)] = instance

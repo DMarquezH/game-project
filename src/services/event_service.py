@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Type, Callable, Dict, TypeVar, List, ParamSpec, Generic, Set
 
-from core.service_container import Service
+from src.core.service_container import Service
 
 T = TypeVar("T", bound="BaseEvent")
 P = ParamSpec("P")

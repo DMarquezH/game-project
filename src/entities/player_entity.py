@@ -2,8 +2,8 @@ import arcade
 from arcade import Texture
 from pyglet.math import Vec2
 
-from services.event_service import EventBus
-from settings.game_events import PlayerAttackedMeleeEvent
+from src.services.event_service import EventBus
+from src.settings.game_events import PlayerAttackedMeleeEvent
 
 
 class Player(arcade.Sprite):
@@ -36,12 +36,10 @@ class Player(arcade.Sprite):
         self.change_x = self.movement_speed * self.movement_speed_multi * move_dir.x
         self.change_y = self.movement_speed * self.movement_speed_multi * move_dir.y
 
-    # Falta implementar InputService
     def attack_melee(self, cursor_pos: Vec2):
 
         attack_direction = (cursor_pos - self.position).normalize()
 
-        # Notificamos el ataque melee del jugador usando el bus de eventos
         self.event_bus.dispatch(PlayerAttackedMeleeEvent(
             self.position,
             attack_direction,
