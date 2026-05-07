@@ -2,7 +2,8 @@ import arcade
 import arcade.gui
 
 from src.ui.widgets.base_button import BaseButton
-
+from pathlib import Path
+from PIL import Image
 
 class GridButtons(arcade.gui.UIAnchorLayout):
     """
@@ -22,20 +23,22 @@ class GridButtons(arcade.gui.UIAnchorLayout):
 
 
     """
-    def __init__(self, button_list:list[dict], space_between:int=0, position_x="center", position_y="center"):
+    def __init__(self, button_list:list[dict],background:Path=None, space_between:int=0, position_x="center", position_y="center"):
         super().__init__()
         box_layout = arcade.gui.UIBoxLayout(space_between=space_between)
-
         for button in button_list:
             boton = BaseButton(
                 sheet=button["sheet"],
+                sound=button["sound"],
                 action=button["action"],
-                # If not value, set 0
                 image_width=button.get("width",0),
                 image_height=button.get("height",0),
                 columns=button.get("columns",0),
                 count=button.get("count",0)
             )
             box_layout.add(boton)
-
+        if background:
+            tx = arcade.load_texture(background)
+            imageUI = arcade.gui.UIImage(texture=tx)
+            self.add(child=imageUI,anchor_x=position_x,anchor_y=position_y)
         self.add(child=box_layout,anchor_x=position_x,anchor_y=position_y,)

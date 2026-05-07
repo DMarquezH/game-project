@@ -20,10 +20,12 @@ class MainMenuView(BaseView):
         self.ui = UIManager()
 
         menu_textures = GameResources.get("textures") / "ui" / "menus"
+        sounds = GameResources.get("sounds")
 
         self.button_data = [
             {
                 "sheet": menu_textures / "button_jugar_spritesheet.png",
+                "sound": sounds / "menu_button.wav",
                 "action": lambda: nav_service.navigate(Views.GAME),
                 "width": 300,
                 "height": 138,
@@ -32,6 +34,7 @@ class MainMenuView(BaseView):
             },
             {
                 "sheet": menu_textures / "button_opciones_spritesheet.png",
+                "sound": sounds / "menu_button.wav",
                 "action": None,
                 "width": 300,
                 "height": 138,
@@ -40,6 +43,7 @@ class MainMenuView(BaseView):
             },
             {
                 "sheet": menu_textures / "button_salir_spritesheet.png",
+                "sound": sounds / "menu_button.wav",
                 "action": lambda: arcade.close_window(),
                 "width": 300,
                 "height": 138,

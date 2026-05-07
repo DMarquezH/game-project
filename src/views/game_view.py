@@ -9,7 +9,9 @@ from src.services.input_service import InputService
 from src.services.navigation import NavigationService
 
 from src.world.world import World
-from src.ui.TestUI import TestUI
+from src.ui.hud_controller import HudController
+from src.ui.pause_controller import PauseController
+
 
 
 class GameView(BaseView):
@@ -19,24 +21,20 @@ class GameView(BaseView):
 
         self.event_bus = event_bus
         self.nav_service = nav_service
-
-        # Temp
-        self.test_ui = TestUI(nav_service)
-
         self.active_keyboard_inputs = set()
         self.world = World(event_bus)
-        self.hud = None
+        self.hud = HudController()
+        self.pause_menu = PauseController(self)
 
         self.world_camera = GameCamera(follow_target=self.world.player)
         self.ui_camera = Camera2D()
 
-        self.example_text = arcade.Text("Example Text", 20, self.window.height - 36, font_size=16)
 
     def on_show_view(self):
         self.background_color = arcade.color.BLACK
-
+        self.hud.enable()
     def on_hide_view(self):
-        pass
+        self.hud.disable()
 
     def on_draw(self) -> bool | None:
         super().on_draw()
@@ -45,9 +43,10 @@ class GameView(BaseView):
         self.world.draw()
 
         self.ui_camera.use()
+        self.hud.draw()
 
-        # draw UI
-        self.example_text.draw()
+        if self.pause_menu.get_status():
+            self.pause_menu.draw()
 
     def on_update(self, delta_time: float) -> bool | None:
         self.check_inputs()
@@ -56,7 +55,9 @@ class GameView(BaseView):
         self.world_camera.update(delta_time)
 
     def check_inputs(self):
-        self.check_player_movement()
+        if not self.pause_menu.get_status():
+            self.check_player_movement()
+        self.check_pause()
 
     def check_player_movement(self):
 
@@ -73,6 +74,11 @@ class GameView(BaseView):
             x -= 1
 
         self.world.player.move(Vec2(x, y).normalize())
+
+    def check_pause(self):
+        if arcade.key.ESCAPE in self.active_keyboard_inputs:
+            self.pause_menu.enable()
+            self.world.freeze()
 
     def on_key_press(self, symbol: int, modifiers: int):
         super().on_key_press(symbol, modifiers)

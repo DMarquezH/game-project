@@ -1,6 +1,8 @@
 import arcade
 import arcade.gui as gui
+import time
 from pathlib import Path
+
 
 class BaseButton(gui.UITextureButton):
     """
@@ -16,9 +18,10 @@ class BaseButton(gui.UITextureButton):
         action(callabe,optional): function to execute when te button is clicked. Defaults to None.
     """
 
-    def __init__(self,sheet:Path,x=0, y=0, image_width=0, image_height=0, count=0, columns=0,  action=None):
+    def __init__(self,sheet:Path,sound:Path,x=0, y=0, image_width=0, image_height=0, count=0, columns=0,  action=None):
         tex_normal = None
         tex_hover = None
+        self.sound = None
         if sheet.is_file():
             texture_grid = arcade.SpriteSheet(sheet)
             self.texture_list = texture_grid.get_texture_grid(size=(image_width,image_height),columns=columns,count=count)
@@ -29,7 +32,8 @@ class BaseButton(gui.UITextureButton):
             super().__init__(width=image_width,height=image_height,x=x,y=y,texture=tex_normal,texture_hovered=tex_hover)
             self.action = action
 
-        # SONIDOS?
+        if sound.is_file() and sound.suffix in [".wav",".mp3"]:
+            self.sound = arcade.Sound(sound)
 
     def on_click(self, event: gui.UIMousePressEvent):
         """
@@ -38,5 +42,8 @@ class BaseButton(gui.UITextureButton):
         Args:
             event(gui.UIMousePressEvent): the mouse event
         """
+        if self.sound:
+            self.sound.play()
+        time.sleep(0.1)
         if self.action:
             self.action()

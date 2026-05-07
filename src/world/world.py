@@ -17,6 +17,9 @@ class World:
 
         self.systems = TypeRegistry()
 
+        # A falta de implementar enemigos para parar su movimiento
+        self.is_freeze = False
+
         self.scene: Scene | None = None
         self.player: Player | None = None
         self.physics: PhysicsEngineSimple | None = None
@@ -68,7 +71,14 @@ class World:
         self.scene.draw()
 
     def update(self):
-        self.physics.update()
+        if not self.is_freeze:
+            self.physics.update()
+
+    def freeze(self):
+        self.is_freeze = True
+
+    def unfreeze(self):
+        self.is_freeze = False
 
     def add_entity(self, entity: Sprite):
         pass
