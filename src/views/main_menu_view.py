@@ -2,10 +2,10 @@ import arcade
 from arcade.gui import UIManager
 
 from src.core.display import BaseView
-from src.services.input_service import InputService
-from src.services.navigation import NavigationService
+from src.services.input.input_service import InputService
+from src.services.navigation_service import NavigationService
 from src.settings.game_resources import GameResources
-from src.settings.game_views import Views
+from src.settings.registered_views import RegisteredViews
 from src.ui.grid_button_builder import GridButtons
 
 
@@ -26,7 +26,7 @@ class MainMenuView(BaseView):
             {
                 "sheet": menu_textures / "button_jugar_spritesheet.png",
                 "sound": sounds / "menu_button.wav",
-                "action": lambda: nav_service.navigate(Views.GAME),
+                "action": lambda: nav_service.navigate(RegisteredViews.GAME),
                 "width": 300,
                 "height": 138,
                 "columns": 2,

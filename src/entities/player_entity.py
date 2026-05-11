@@ -1,9 +1,9 @@
 import arcade
 from arcade import Texture
-from pyglet.math import Vec2
 
 from src.services.event_service import EventBus
-from src.settings.game_events import PlayerAttackedMeleeEvent
+from src.settings.registered_gameplay_events import PlayerAttackedMeleeEvent
+from src.services.input.settings.registered_input_events import PlayerAttackInputEvent, PlayerMoveInputEvent
 
 
 class Player(arcade.Sprite):
@@ -29,16 +29,30 @@ class Player(arcade.Sprite):
 
         # self.stats = EntityStats()
 
-    def update(self, delta_time: float = 1 / 60, *args, **kwargs):
-        pass
+        self.subscribe_events()
 
-    def move(self, move_dir: Vec2):
+    def subscribe_events(self):
+        self.event_bus.subscribe(PlayerMoveInputEvent, self.move)
+        self.event_bus.subscribe(PlayerAttackInputEvent, self.attack_melee)
+
+    def update(self, delta_time: float = 1 / 60, *args, **kwargs):
+
+        if self.change_x != 0:
+            self.change_x = round(self.change_x * 0.8, 2)
+
+        if self.change_y != 0:
+            self.change_y = round(self.change_y * 0.8, 2)
+
+    def move(self, event: PlayerMoveInputEvent):
+
+        move_dir = event.move_dir.normalize()
+
         self.change_x = self.movement_speed * self.movement_speed_multi * move_dir.x
         self.change_y = self.movement_speed * self.movement_speed_multi * move_dir.y
 
-    def attack_melee(self, cursor_pos: Vec2):
+    def attack_melee(self, event: PlayerAttackInputEvent):
 
-        attack_direction = (cursor_pos - self.position).normalize()
+        attack_direction = (event.mouse_pos - self.position).normalize()
 
         self.event_bus.dispatch(PlayerAttackedMeleeEvent(
             self.position,

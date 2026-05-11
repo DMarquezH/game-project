@@ -1,12 +1,16 @@
+from src.services.event_service import EventBus
 from src.settings.game_resources import GameResources
+from src.services.input.settings.registered_input_events import TogglePauseInputEvent
 from src.ui.grid_button_builder import GridButtons
 from src.ui.base_gui_controller import BaseGuiController
-from src.settings.game_views import Views
+from src.settings.registered_views import RegisteredViews
 
 
 class PauseController(BaseGuiController):
-    def __init__(self,view):
+
+    def __init__(self, view, event_bus: EventBus):
         super().__init__()
+        self.event_bus = event_bus
         self.enabled = False
         self.current_view = view
 
@@ -17,7 +21,7 @@ class PauseController(BaseGuiController):
             {
                 "sheet": menu_textures / "button_reanudar_spritesheet.png",
                 "sound": sounds / "menu_button.wav",
-                "action": lambda : unpause(self.current_view),
+                "action": lambda : self.event_bus.dispatch(TogglePauseInputEvent()),
                 "width": 300,
                 "height": 138,
                 "columns": 2,
@@ -35,7 +39,7 @@ class PauseController(BaseGuiController):
             {
                 "sheet": menu_textures / "button_menu_principal_spritesheet.png",
                 "sound": sounds / "menu_button.wav",
-                "action": lambda: self.current_view.nav_service.navigate(Views.MAIN_MENU),
+                "action": lambda: self.current_view.nav_service.navigate(RegisteredViews.MAIN_MENU),
                 "width": 300,
                 "height": 138,
                 "columns": 2,
@@ -56,6 +60,3 @@ class PauseController(BaseGuiController):
 
     def is_enabled(self):
         return self.enabled
-
-def unpause(view):
-    view.pause_menu.disable()

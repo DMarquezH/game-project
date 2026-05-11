@@ -1,5 +1,5 @@
 from src.services.event_service import EventBus
-from src.settings.game_events import PlayerAttackedMeleeEvent
+from src.settings.registered_gameplay_events import PlayerAttackedMeleeEvent
 from src.world.systems.base_system import BaseSystem
 
 

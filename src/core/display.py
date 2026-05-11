@@ -2,10 +2,9 @@ import arcade
 from arcade import Camera2D
 
 from src.core.service_container import ServiceContainer
-from src.input.device.keyboard_input import KeyboardInput
-from src.input.device.mouse_input import MouseInput
-from src.input.game_input import InputAction
-from src.services.input_service import InputService
+from src.services.input.devices.keyboard_device import KeyboardInputDevice
+from src.services.input.devices.mouse_device import MouseInputDevice
+from src.services.input.input_service import InputService
 
 
 class BaseWindow(arcade.Window):
@@ -24,44 +23,39 @@ class BaseView(arcade.View):
         super().__init__()
         self.input_service = input_service
 
-    def on_draw(self) -> bool | None:
+    def on_update(self, dt: float):
+        self.input_service.update()
+
+    def on_draw(self):
         self.clear()
 
     def on_key_press(self, symbol: int, modifiers: int):
-        inp = KeyboardInput.from_key(symbol, InputAction.PRESS)
-        # self.input_service.add_input(inp)
+        inp = KeyboardInputDevice.from_key(symbol)
+        self.input_service.register_press(inp)
 
     def on_key_release(self, symbol: int, modifiers: int):
-        inp = KeyboardInput.from_key(symbol, InputAction.RELEASE)
-        # self.input_service.add_input(inp)
+        inp = KeyboardInputDevice.from_key(symbol)
+        self.input_service.register_release(inp)
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
-        inp = MouseInput.from_button(x, y, button, InputAction.PRESS)
-        # self.input_service.add_input(inp)
+        inp = MouseInputDevice.from_button(button, x, y)
+        self.input_service.register_press(inp)
 
     def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
-        inp = MouseInput.from_button(x, y, button, InputAction.RELEASE)
-        # self.input_service.add_input(inp)
+        inp = MouseInputDevice.from_button(button, x, y)
+        self.input_service.register_release(inp)
 
     def on_mouse_scroll(self, x: int, y: int, scroll_x: int, scroll_y: int):
-        inp = MouseInput.from_scroll(x, y, scroll_x, scroll_y)
-        # self.input_service.add_input(inp)
+        inp = MouseInputDevice.from_scroll(x, y, scroll_x, scroll_y)
+        self.input_service.register_change(inp)
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
-        inp = MouseInput.from_motion(x, y, dx, dy)
-        # self.input_service.add_input(inp)
+        inp = MouseInputDevice.from_motion(x, y, dx, dy)
+        self.input_service.register_change(inp)
 
-    def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, _buttons: int, _modifiers: int):
-        inp = MouseInput.from_drag(x, y, dx, dy, _buttons)
-        # self.input_service.add_input(inp)
-
-    def on_mouse_enter(self, x: int, y: int):
-        inp = MouseInput.from_area_interact(x, y, InputAction.PRESS)
-        # self.input_service.add_input(inp)
-
-    def on_mouse_leave(self, x: int, y: int):
-        inp = MouseInput.from_area_interact(x, y, InputAction.RELEASE)
-        # self.input_service.add_input(inp)
+    def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, button: int, _modifiers: int):
+        inp = MouseInputDevice.from_drag(button, x, y, dx, dy)
+        self.input_service.register_change(inp)
 
 
 class GameCamera:

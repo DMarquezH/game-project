@@ -1,17 +1,18 @@
 import arcade.color
 from arcade import Camera2D
-from pyglet.math import Vec2
 
 from src.core.display import BaseView, GameCamera
 from src.services.event_service import EventBus
+from src.services.input.devices.mouse_device import MouseInputDevice
 
-from src.services.input_service import InputService
-from src.services.navigation import NavigationService
+from src.services.input.input_service import InputService
+from src.services.navigation_service import NavigationService
+from src.services.input.settings.registered_input_contexts import RegisteredInputContexts
+from src.services.input.settings.registered_input_events import TogglePauseInputEvent
 
 from src.world.world import World
 from src.ui.hud_controller import HudController
 from src.ui.pause_controller import PauseController
-
 
 
 class GameView(BaseView):
@@ -25,20 +26,40 @@ class GameView(BaseView):
         self.active_keyboard_inputs = set()
         self.world = World(event_bus)
         self.hud = HudController()
-        self.pause_menu = PauseController(self)
+        self.pause_menu = PauseController(self, event_bus)
 
         self.world_camera = GameCamera(follow_target=self.world.player)
         self.ui_camera = Camera2D()
 
+        self.subscribe_listeners()
+
+    def subscribe_listeners(self):
+        self.event_bus.subscribe(TogglePauseInputEvent, self.on_toggle_pause)
 
     def on_show_view(self):
+
+        self.input_service.enable_context(RegisteredInputContexts.GAMEPLAY)
+        self.input_service.enable_context(RegisteredInputContexts.DEBUG)
+
         self.background_color = arcade.color.BLACK
         self.hud.enable()
 
     def on_hide_view(self):
-        self.hud.disable()
 
-    def on_draw(self) -> bool | None:
+        self.input_service.disable_context(RegisteredInputContexts.GAMEPLAY)
+        self.input_service.disable_context(RegisteredInputContexts.DEBUG)
+
+        self.hud.disable()
+        self.pause_menu.disable()
+
+    def on_update(self, dt: float):
+        super().on_update(dt)
+
+        if not self.pause_menu.is_enabled():
+            self.world.update()
+            self.world_camera.update(dt)
+
+    def on_draw(self):
         super().on_draw()
 
         self.world_camera.use()
@@ -50,49 +71,38 @@ class GameView(BaseView):
         if self.pause_menu.is_enabled():
             self.pause_menu.draw()
 
-    def on_update(self, delta_time: float) -> bool | None:
-        self.check_inputs()
-        if not self.pause_menu.is_enabled(): self.world.update()
+    def on_toggle_pause(self, _: TogglePauseInputEvent):
 
-        self.world_camera.update(delta_time)
+        if self.pause_menu.is_enabled():
+            self.unpause()
+        else:
+            self.pause()
 
-    def check_inputs(self):
-        if not self.pause_menu.is_enabled():
-            self.check_player_movement()
-        self.check_pause()
+    def pause(self):
 
-    def check_player_movement(self):
+        self.input_service.enable_context(RegisteredInputContexts.PAUSE)
 
-        x, y = 0, 0
+        self.input_service.disable_context(RegisteredInputContexts.GAMEPLAY)
+        self.input_service.disable_context(RegisteredInputContexts.DEBUG)
 
-        if arcade.key.W in self.active_keyboard_inputs:
-            y += 1
-        if arcade.key.S in self.active_keyboard_inputs:
-            y -= 1
+        self.pause_menu.enable()
 
-        if arcade.key.D in self.active_keyboard_inputs:
-            x += 1
-        if arcade.key.A in self.active_keyboard_inputs:
-            x -= 1
+    def unpause(self):
 
-        self.world.player.move(Vec2(x, y).normalize())
+        self.input_service.enable_context(RegisteredInputContexts.GAMEPLAY)
+        self.input_service.enable_context(RegisteredInputContexts.DEBUG)
 
-    def check_pause(self):
-        if arcade.key.ESCAPE in self.active_keyboard_inputs:
-            self.pause_menu.enable()
+        self.input_service.disable_context(RegisteredInputContexts.PAUSE)
 
-    def on_key_press(self, symbol: int, modifiers: int):
-        super().on_key_press(symbol, modifiers)
-        self.active_keyboard_inputs.add(symbol)
-
-    def on_key_release(self, symbol: int, modifiers: int):
-        super().on_key_release(symbol, modifiers)
-        self.active_keyboard_inputs.discard(symbol)
+        self.pause_menu.disable()
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
-        super().on_mouse_press(x, y, button, modifiers)
 
         in_world_coords = self.world_camera.cam.unproject((x, y)).xy
 
-        if button == arcade.MOUSE_BUTTON_LEFT:
-            self.world.player.attack_melee(in_world_coords)
+        inp = MouseInputDevice.from_button(
+            button,
+            in_world_coords.x, in_world_coords.y
+        )
+
+        self.input_service.register_press(inp)

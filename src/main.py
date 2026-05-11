@@ -2,16 +2,17 @@ from typing import Type
 
 import arcade
 
-from settings.game_views import Views
+from settings.registered_views import RegisteredViews
 from src.core.registry import Registry
 from src.core.display import BaseWindow, BaseView
 from src.services.event_service import EventBus
 from src.core.service_container import ServiceContainer
 
-from src.services.input_service import InputService
-from src.services.navigation import NavigationService
+from src.services.input.input_service import InputService
+from src.services.navigation_service import NavigationService
 from src.settings.game_constants import GameConstants
 from src.settings.game_resources import GameResources
+from src.services.input.settings.registered_input_contexts import RegisteredInputContexts
 
 from src.views.main_menu_view import MainMenuView
 from src.views.game_view import GameView
@@ -35,8 +36,8 @@ def register_views(view_registry: Registry[Type[BaseView]]):
 
     if view_registry.is_frozen(): return
 
-    view_registry.register(Views.MAIN_MENU, MainMenuView)
-    view_registry.register(Views.GAME, GameView)
+    view_registry.register(RegisteredViews.MAIN_MENU, MainMenuView)
+    view_registry.register(RegisteredViews.GAME, GameView)
 
     view_registry.freeze()
 
@@ -44,9 +45,13 @@ def init_services(service_container: ServiceContainer, window: MainWindow, view_
 
     if service_container.is_frozen(): return
 
-    service_container.register(NavigationService(window, service_container, view_registry))
-    service_container.register(EventBus())
-    service_container.register(InputService())
+    nav_service = NavigationService(window, service_container, view_registry)
+    event_bus = EventBus()
+    input_service = InputService(event_bus)
+
+    service_container.register(nav_service)
+    service_container.register(event_bus)
+    service_container.register(input_service)
 
     service_container.freeze()
 
@@ -60,6 +65,7 @@ def start_game(service_container: ServiceContainer):
 def run_game():
 
     GameResources.init()
+    RegisteredInputContexts.init()
 
     view_registry = Registry[Type[BaseView]]()
     service_container = ServiceContainer()
@@ -68,6 +74,7 @@ def run_game():
 
     register_views(view_registry)
     init_services(service_container, window, view_registry)
+
     start_game(service_container)
 
     arcade.run()

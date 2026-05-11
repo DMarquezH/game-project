@@ -4,8 +4,8 @@ from arcade import Scene, PhysicsEngineSimple
 from src.services.event_service import EventBus
 from src.core.registry import TypeRegistry
 from src.entities.player_entity import Player
-from src.settings.game_constants import GameConstants
 from src.settings.game_resources import GameResources
+from src.services.input.settings.registered_input_events import ToggleDebugInputEvent
 from src.world.systems.attack_system import AttackSystem
 from src.world.systems.base_system import BaseSystem
 
@@ -21,6 +21,8 @@ class World:
         self.scene: Scene | None = None
         self.player: Player | None = None
         self.physics: PhysicsEngineSimple | None = None
+
+        self.debug = False
 
         self.init()
 
@@ -68,9 +70,20 @@ class World:
 
         self.physics = PhysicsEngineSimple(self.player, self.scene["trees"])
 
+        ### Events ###
+
+        self.event_bus.subscribe(ToggleDebugInputEvent, self.toggle_debug)
+
     def draw(self):
+
         self.scene.draw()
-        self.scene.draw_hit_boxes(arcade.color.RED, 3)
+
+        if self.debug:
+            self.scene.draw_hit_boxes(arcade.color.RED, 3)
 
     def update(self):
+        self.player.update()
         self.physics.update()
+
+    def toggle_debug(self, _: ToggleDebugInputEvent):
+        self.debug = not self.debug
