@@ -38,13 +38,16 @@ class World:
         ### Tilemap ###
 
         layer_options = {
-            "trees": {  # Trees es el nombre de la capa de arboles en el tilemap
-                "use_spatial_hash": True  # solo se revisarán las colisiones de los objetos cerca del jugador
-            }
+            # Estan en orden de superposicion
+            "Top2":{ "use_spatial_hash": True },
+            "top1":{ "use_spatial_hash": True },
+            "Border": {"use_spatial_hash": True},
+            "Border2": {"use_spatial_hash": True},
+            "Obstacles": { "use_spatial_hash": True }
         }
 
         tile_map = arcade.load_tilemap(
-            GameResources.get("levels") / "level_1" / "Test_map.tmj",
+            GameResources.get("levels") / "level_2" / "LV2_1.0.tmj",
             scaling=1,
             layer_options=layer_options,
         )
@@ -53,22 +56,22 @@ class World:
 
         self.scene = Scene.from_tilemap(tile_map)
 
-        self.scene.add_sprite_list_after("player", "ground")
+        self.scene.add_sprite_list_after("player", "Floor")
 
         ### Player ###
 
         player_texture = arcade.load_texture(
             GameResources.get("textures") / "entity" / "player_highres.png"
         )
-
+        spawnpoint = (tile_map.object_lists["Entities"][0]) # hice una capa de obj con la ubicacion de inicio del jugador
         self.player = Player(self.event_bus, player_texture, 0.125)
-        self.player.position = (0, 0)
+        self.player.position = (spawnpoint.shape[0],spawnpoint.shape[1])
 
         self.scene.add_sprite("player", self.player)
 
         ### Physics Engine ###
 
-        self.physics = PhysicsEngineSimple(self.player, self.scene["trees"])
+        self.physics = PhysicsEngineSimple(self.player, [self.scene["Obstacles"], self.scene["Border"], self.scene["Border2"]])
 
         ### Events ###
 
