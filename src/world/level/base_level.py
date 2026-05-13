@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
+
+import arcade
 from arcade import TileMap
+
+
 class BaseLevel(ABC):
 
     @property
@@ -15,6 +19,9 @@ class BaseLevel(ABC):
     @abstractmethod
     def collision_layers(self) -> list[str]: ...
 
+    @property
+    @abstractmethod
+    def bounds(self) -> arcade.Rect: ...
 
     def player_start(self, tile_map: TileMap) -> tuple[float, float]:
         spawn = tile_map.object_lists["Entities"][0]

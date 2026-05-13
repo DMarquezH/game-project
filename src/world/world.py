@@ -9,18 +9,19 @@ from src.services.event_service import EventBus
 from src.entities.player_entity import Player
 from src.settings.game_resources import GameResources
 from src.services.input.settings.registered_input_events import ToggleDebugInputEvent
+from src.world.level.registered_levels import RegisteredLevels
 from src.world.systems.combat.combat_system import CombatSystem
 from src.world.systems.base_system import BaseSystem
 from src.world.systems.movement.movement_system import MovementSystem, MovementMode
-from src.world.levels.base_level import BaseLevel
-from src.world.levels.level_loader import LevelLoader
+from src.world.level.base_level import BaseLevel
+from src.world.level.level_loader import LevelLoader
 
 
 class World:
 
     def __init__(self, event_bus: EventBus):
 
-        self.current_level = None
+        self.current_level: BaseLevel | None = None
         self.event_bus = event_bus
 
         self.scene: Scene | None = None
@@ -39,6 +40,7 @@ class World:
         self._init_systems()
         self._subscribe_events()
 
+        self.load_level(RegisteredLevels.CEMENTERY)
 
     def _init_systems(self):
 
@@ -52,10 +54,11 @@ class World:
             system.init()
 
     def load_level(self, level: BaseLevel) -> None:
+
         if self.current_level:
             self._unload()
-        self.current_level = level
 
+        self.current_level = level
         data = LevelLoader(level)
 
         self._init_scene(data)
@@ -63,9 +66,11 @@ class World:
         self._init_physics(data)
 
     def _unload(self) -> None:
+
         self.scene = None
         self.player = None
         self.physics = None
+
         self.entities.clear()
 
     def _init_scene(self, data: LevelLoader):
@@ -117,6 +122,9 @@ class World:
 
         if self.debug:
             self.scene.draw_hit_boxes(arcade.color.RED, 3)
+
+    def get_level_bounds(self) -> arcade.Rect:
+        return self.current_level.bounds
 
     def toggle_debug(self, _: ToggleDebugInputEvent):
         self.debug = not self.debug

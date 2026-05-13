@@ -60,17 +60,28 @@ class BaseView(arcade.View):
 
 class GameCamera:
 
-    def __init__(self, follow_target: arcade.Sprite | None = None, follow_lerp: float = 0.1):
+    def __init__(
+            self,
+            follow_target: arcade.Sprite = None,
+            follow_lerp: float = 0.1,
+            clamp_rect: arcade.Rect = None
+    ):
         self.cam = Camera2D()
 
         self.follow_target = follow_target
         self.follow_lerp = follow_lerp
 
-    def update(self, delta_time: float):
-        if self.follow_target:
-            self.update_pos(delta_time)
+        self.clamp_rect = clamp_rect
 
-    def update_pos(self, delta_time: float):
+    def update(self, delta_time: float):
+
+        if self.follow_target is not None:
+            self._update_pos(delta_time)
+
+        if self.clamp_rect is not None:
+            self._clamp_pos()
+
+    def _update_pos(self, delta_time: float):
 
         target_pos = self.follow_target.position
         current_pos = self.cam.position
@@ -81,3 +92,22 @@ class GameCamera:
 
     def use(self):
         self.cam.use()
+
+    def _clamp_pos(self):
+
+        x, y = self.cam.position
+        viewport = self.cam.viewport
+
+        half_w = viewport.width / 2
+        half_h = viewport.height / 2
+
+        min_x = self.clamp_rect.left + half_w
+        max_x = self.clamp_rect.right - half_w
+
+        min_y = self.clamp_rect.bottom + half_h
+        max_y = self.clamp_rect.top - half_h
+
+        clamped_x = max(min_x, min(x, max_x))
+        clamped_y = max(min_y, min(y, max_y))
+
+        self.cam.position = arcade.Vec2(clamped_x, clamped_y)

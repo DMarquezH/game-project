@@ -14,9 +14,6 @@ from src.world.world import World
 from src.ui.hud_controller import HudController
 from src.ui.pause_controller import PauseController
 
-# luego ire poniendo mas con el resto de niveles
-from src.world.levels.level2_1 import Level2_1
-
 
 class GameView(BaseView):
 
@@ -28,11 +25,13 @@ class GameView(BaseView):
 
         self.active_keyboard_inputs = set()
         self.world = World(event_bus)
-        self.world.load_level(Level2_1())
         self.hud = HudController()
         self.pause_menu = PauseController(self, event_bus)
 
-        self.world_camera = GameCamera(follow_target=self.world.player)
+        self.world_camera = GameCamera(
+            follow_target=self.world.player,
+            clamp_rect=self.world.get_level_bounds()
+        )
         self.ui_camera = Camera2D()
 
         self._subscribe_listeners()

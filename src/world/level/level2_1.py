@@ -1,5 +1,9 @@
 from pathlib import Path
-from src.world.levels.base_level import BaseLevel
+
+import arcade
+from arcade import Rect
+
+from src.world.level.base_level import BaseLevel
 from src.settings.game_resources import GameResources
 
 
@@ -11,6 +15,7 @@ class Level2_1(BaseLevel):
 
     @property
     def layer_options(self) -> dict[str, dict]:
+
         return {
             "Top2":      {"use_spatial_hash": True},
             "top1":      {"use_spatial_hash": True},
@@ -22,3 +27,12 @@ class Level2_1(BaseLevel):
     @property
     def collision_layers(self) -> list[str]:
         return ["Obstacles", "Border", "Border2"]
+
+    @property
+    def bounds(self) -> Rect:
+        return arcade.LRBT(
+            left=0,
+            bottom=0,
+            right=64 * 25,
+            top=64 * 15
+        )
