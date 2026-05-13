@@ -1,4 +1,5 @@
 from typing import Dict, Type, Set
+from pathlib import Path
 
 import arcade
 from arcade import Scene, PhysicsEngineSimple
@@ -11,12 +12,15 @@ from src.services.input.settings.registered_input_events import ToggleDebugInput
 from src.world.systems.combat.combat_system import CombatSystem
 from src.world.systems.base_system import BaseSystem
 from src.world.systems.movement.movement_system import MovementSystem, MovementMode
+from src.world.levels.base_level import BaseLevel
+from src.world.levels.level_loader import LevelLoader
 
 
 class World:
 
     def __init__(self, event_bus: EventBus):
 
+        self.current_level = None
         self.event_bus = event_bus
 
         self.scene: Scene | None = None
@@ -33,11 +37,8 @@ class World:
     def init(self):
 
         self._init_systems()
-        self._init_scene()
-        self._init_player()
         self._subscribe_events()
 
-        self.physics = PhysicsEngineSimple(self.player, [self.scene["Obstacles"], self.scene["Border"], self.scene["Border2"]])
 
     def _init_systems(self):
 
@@ -50,38 +51,41 @@ class World:
         for system in self.systems.values():
             system.init()
 
-    def _init_scene(self):
+    def load_level(self, level: BaseLevel) -> None:
+        if self.current_level:
+            self._unload()
+        self.current_level = level
+
+        data = LevelLoader(level)
+
+        self._init_scene(data)
+        self._init_player(data)
+        self._init_physics(data)
+
+    def _unload(self) -> None:
+        self.scene = None
+        self.player = None
+        self.physics = None
+        self.entities.clear()
+
+    def _init_scene(self, data: LevelLoader):
 
         ### TILEMAP ###
 
-        layer_options = {
-            # Estan en orden de superposicion
-            "Top2": {"use_spatial_hash": True},
-            "top1": {"use_spatial_hash": True},
-            "Border": {"use_spatial_hash": True},
-            "Border2": {"use_spatial_hash": True},
-            "Obstacles": {"use_spatial_hash": True}
-        }
-
-        tile_map = arcade.load_tilemap(
-            GameResources.get("levels") / "level_2" / "LV2_1.0.tmj",
-            scaling=1,
-            layer_options=layer_options,
-        )
+        self.scene = Scene.from_tilemap(data.tile_map)
 
         ### SCENE ###
 
-        self.scene = Scene.from_tilemap(tile_map)
         self.scene.add_sprite_list_after("player", "Floor")
 
-    def _init_player(self):
+    def _init_player(self, data: LevelLoader):
 
         player_texture = arcade.load_texture(
             GameResources.get("textures") / "entity" / "player_highres.png"
         )
 
         self.player = Player(self.event_bus, player_texture, 0.125)
-        self.player.position = (500, 600)
+        self.player.position = data.player_start
 
         self.scene.add_sprite("player", self.player)
 
@@ -89,6 +93,10 @@ class World:
         movement_system.add_entity(self.player, MovementMode.FLOOR)
 
         self.entities.add(self.player)
+
+    def _init_physics(self, data: LevelLoader):
+        walls = [self.scene[name] for name in data.collision_layers]
+        self.physics = PhysicsEngineSimple(self.player, walls, )
 
     def _subscribe_events(self):
         self.event_bus.subscribe(ToggleDebugInputEvent, self.toggle_debug)
