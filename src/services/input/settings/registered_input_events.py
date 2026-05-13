@@ -18,8 +18,12 @@ class PlayerAttackInputEvent(BaseEvent):
 
 
 class TogglePauseInputEvent(BaseEvent):
-    pass
+
+    def __init__(self):
+        super().__init__()
 
 
 class ToggleDebugInputEvent(BaseEvent):
-    pass
+
+    def __init__(self):
+        super().__init__()

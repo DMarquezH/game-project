@@ -1,56 +1,57 @@
-import arcade
 from arcade import Texture
 
+from src.entities.base_entity import BaseEntity
 from src.services.event_service import EventBus
 from src.settings.registered_gameplay_events import PlayerAttackedMeleeEvent
 from src.services.input.settings.registered_input_events import PlayerAttackInputEvent, PlayerMoveInputEvent
+from src.world.systems.combat.entity_stats import StatDefinition
+from src.world.systems.movement.movement_events import EntityMoveEvent
 
 
-class Player(arcade.Sprite):
+class Player(BaseEntity):
 
     DEFAULT_MOVEMENT_SPEED = 5
-    DEFAULT_MOVEMENT_SPEED_MULTI = 1
-
-    DEFAULT_ATTACK_SPEED = 0.5
 
     DEFAULT_MELEE_RANGE = 20
     DEFAULT_MELEE_AMPLITUDE = 135
     DEFAULT_MELEE_DAMAGE = 35
 
     def __init__(self, event_bus: EventBus, texture: Texture, scale: float):
-        super().__init__(texture, scale)
+        super().__init__(event_bus)
 
-        self.event_bus = event_bus
-
-        self.movement_speed = Player.DEFAULT_MOVEMENT_SPEED
-        self.movement_speed_multi = Player.DEFAULT_MOVEMENT_SPEED_MULTI
+        self.texture = texture
+        self.scale = scale
 
         self.melee_range = Player.DEFAULT_MELEE_RANGE
 
         # self.stats = EntityStats()
 
-        self.subscribe_events()
+        self._init_stats()
+        self._subscribe_events()
 
-    def subscribe_events(self):
-        self.event_bus.subscribe(PlayerMoveInputEvent, self.move)
-        self.event_bus.subscribe(PlayerAttackInputEvent, self.attack_melee)
+    def _init_stats(self):
+        self.stats.set(StatDefinition.MOVEMENT_SPEED, self.DEFAULT_MOVEMENT_SPEED)
 
-    def update(self, delta_time: float = 1 / 60, *args, **kwargs):
+    def _subscribe_events(self):
+        self.event_bus.subscribe(PlayerMoveInputEvent, self._move)
+        self.event_bus.subscribe(PlayerAttackInputEvent, self._attack_melee)
 
-        if self.change_x != 0:
-            self.change_x = round(self.change_x * 0.8, 2)
+    def _unsubscribe_events(self):
+        self.event_bus.unsubscribe(PlayerMoveInputEvent, self._move)
+        self.event_bus.unsubscribe(PlayerAttackInputEvent, self._attack_melee)
 
-        if self.change_y != 0:
-            self.change_y = round(self.change_y * 0.8, 2)
-
-    def move(self, event: PlayerMoveInputEvent):
+    def _move(self, event: PlayerMoveInputEvent):
 
         move_dir = event.move_dir.normalize()
 
-        self.change_x = self.movement_speed * self.movement_speed_multi * move_dir.x
-        self.change_y = self.movement_speed * self.movement_speed_multi * move_dir.y
+        self.event_bus.dispatch(
+            EntityMoveEvent(
+                self,
+                move_dir
+            )
+        )
 
-    def attack_melee(self, event: PlayerAttackInputEvent):
+    def _attack_melee(self, event: PlayerAttackInputEvent):
 
         attack_direction = (event.mouse_pos - self.position).normalize()
 
@@ -61,3 +62,6 @@ class Player(arcade.Sprite):
             Player.DEFAULT_MELEE_AMPLITUDE,
             Player.DEFAULT_MELEE_DAMAGE
         ))
+
+    def dispose(self):
+        self._unsubscribe_events()

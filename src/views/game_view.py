@@ -31,10 +31,13 @@ class GameView(BaseView):
         self.world_camera = GameCamera(follow_target=self.world.player)
         self.ui_camera = Camera2D()
 
-        self.subscribe_listeners()
+        self._subscribe_listeners()
 
-    def subscribe_listeners(self):
+    def _subscribe_listeners(self):
         self.event_bus.subscribe(TogglePauseInputEvent, self.on_toggle_pause)
+
+    def _unsubscribe_listeners(self):
+        self.event_bus.unsubscribe(TogglePauseInputEvent, self.on_toggle_pause)
 
     def on_show_view(self):
 
@@ -46,11 +49,15 @@ class GameView(BaseView):
 
     def on_hide_view(self):
 
+        self._unsubscribe_listeners()
+
         self.input_service.disable_context(RegisteredInputContexts.GAMEPLAY)
         self.input_service.disable_context(RegisteredInputContexts.DEBUG)
 
         self.hud.disable()
         self.pause_menu.disable()
+
+        self.world.dispose()
 
     def on_update(self, dt: float):
         super().on_update(dt)
