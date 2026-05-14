@@ -10,7 +10,7 @@ from services.navigation_service import NavigationService
 from services.input.settings.registered_input_contexts import RegisteredInputContexts
 from services.input.settings.registered_input_events import TogglePauseInputEvent
 
-from world.world import World
+from world.world_module import World
 from ui.hud_controller import HudController
 from ui.pause_controller import PauseController
 

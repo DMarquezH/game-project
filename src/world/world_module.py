@@ -8,12 +8,12 @@ from services.event_service import EventBus
 from entities.player_entity import Player
 from settings.game_resources import GameResources
 from services.input.settings.registered_input_events import ToggleDebugInputEvent
-from level.registered_levels import RegisteredLevels
-from systems.combat.combat_system import CombatSystem
-from systems.base_system import BaseSystem
-from systems.movement.movement_system import MovementSystem, MovementMode
-from level.base_level import BaseLevel
-from level.level_loader import LevelLoader
+from world.level.registered_levels import RegisteredLevels
+from world.systems.combat.combat_system import CombatSystem
+from world.systems.base_system import BaseSystem
+from world.systems.movement.movement_system import MovementSystem, MovementMode
+from world.level.base_level import BaseLevel
+from world.level.level_loader import LevelLoader
 
 
 class World:
