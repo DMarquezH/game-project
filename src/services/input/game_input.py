@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import TypeVar, Generic
 
-from src.services.input.input_type import InputType
+from services.input.input_type import InputType
 
 T = TypeVar("T", bound=InputType)
 

@@ -1,20 +1,19 @@
 from typing import Dict, Type, Set
-from pathlib import Path
 
 import arcade
 from arcade import Scene, PhysicsEngineSimple
 
-from src.entities.base_entity import BaseEntity
-from src.services.event_service import EventBus
-from src.entities.player_entity import Player
-from src.settings.game_resources import GameResources
-from src.services.input.settings.registered_input_events import ToggleDebugInputEvent
-from src.world.level.registered_levels import RegisteredLevels
-from src.world.systems.combat.combat_system import CombatSystem
-from src.world.systems.base_system import BaseSystem
-from src.world.systems.movement.movement_system import MovementSystem, MovementMode
-from src.world.level.base_level import BaseLevel
-from src.world.level.level_loader import LevelLoader
+from entities.base_entity import BaseEntity
+from services.event_service import EventBus
+from entities.player_entity import Player
+from settings.game_resources import GameResources
+from services.input.settings.registered_input_events import ToggleDebugInputEvent
+from level.registered_levels import RegisteredLevels
+from systems.combat.combat_system import CombatSystem
+from systems.base_system import BaseSystem
+from systems.movement.movement_system import MovementSystem, MovementMode
+from level.base_level import BaseLevel
+from level.level_loader import LevelLoader
 
 
 class World:

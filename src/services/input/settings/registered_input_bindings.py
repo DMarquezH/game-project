@@ -1,10 +1,10 @@
 import arcade
 
-from src.services.input.devices.keyboard_device import KeyboardInputDevice
-from src.services.input.devices.mouse_device import MouseInputDevice
-from src.services.input.input_binding import InputTrigger, CompositeAxisInputBinding, SimpleInputBinding
-from src.services.input.settings.registered_composite_axes import RegisteredCompositeAxes
-from src.services.input.settings.registered_input_actions import *
+from services.input.devices.keyboard_device import KeyboardInputDevice
+from services.input.devices.mouse_device import MouseInputDevice
+from services.input.input_binding import InputTrigger, CompositeAxisInputBinding, SimpleInputBinding
+from services.input.settings.registered_composite_axes import RegisteredCompositeAxes
+from services.input.settings.registered_input_actions import *
 
 
 class RegisteredInputBindings:

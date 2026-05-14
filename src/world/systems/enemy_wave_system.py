@@ -1,9 +1,9 @@
 from enum import Enum, auto
 from typing import Dict
 
-from src.entities.enemy_entity import EnemyEntity
-from src.services.event_service import EventBus
-from src.world.systems.base_system import BaseSystem
+from entities.enemy_entity import EnemyEntity
+from services.event_service import EventBus
+from world.systems.base_system import BaseSystem
 
 
 class EnemyClass(Enum):

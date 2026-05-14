@@ -3,8 +3,8 @@ from pathlib import Path
 import arcade
 from arcade import Rect
 
-from src.world.level.base_level import BaseLevel
-from src.settings.game_resources import GameResources
+from world.level.base_level import BaseLevel
+from settings.game_resources import GameResources
 
 
 class Level2_1(BaseLevel):

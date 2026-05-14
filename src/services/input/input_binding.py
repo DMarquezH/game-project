@@ -3,10 +3,10 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import TypeVar, List, Dict
 
-from src.services.input.game_input import InputSignature
-from src.services.input.input_action import InputAction
-from src.services.input.input_type import AxisInput, InputType
-from src.services.input.util.composite_axis import CompositeAxis
+from services.input.game_input import InputSignature
+from services.input.input_action import InputAction
+from services.input.input_type import AxisInput, InputType
+from services.input.util.composite_axis import CompositeAxis
 
 T = TypeVar("T", bound=InputType)
 
@@ -36,7 +36,7 @@ class InputBinding(ABC):
         pass
 
     @abstractmethod
-    def resolve_value(self, active_inputs: Dict[InputSignature, ActiveInput]) -> T:
+    def resolve_value(self, active_inputs: Dict[InputSignature, ActiveInput]) -> T | None:
         pass
 
 
@@ -49,7 +49,7 @@ class SimpleInputBinding(InputBinding):
     def input_signatures(self) -> List[InputSignature]:
         return [self.input_signature]
 
-    def resolve_value(self, active_inputs: Dict[InputSignature, ActiveInput]) -> T:
+    def resolve_value(self, active_inputs: Dict[InputSignature, ActiveInput]) -> T | None:
 
         if self.input_signature in active_inputs.keys():
             return active_inputs.get(self.input_signature).value
@@ -66,5 +66,5 @@ class CompositeAxisInputBinding(InputBinding):
     def input_signatures(self) -> List[InputSignature]:
         return self.composite_axis.signatures()
 
-    def resolve_value(self, active_inputs: Dict[InputSignature, ActiveInput]) -> AxisInput:
-        return self.composite_axis.resolve(active_inputs.keys())
+    def resolve_value(self, active_inputs: Dict[InputSignature, ActiveInput]) -> AxisInput | None:
+        return self.composite_axis.resolve(list(active_inputs.keys()))

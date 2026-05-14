@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import TypeVar
 
-from src.services.event_service import EventBus
-from src.services.input.game_input import GameInput
-from src.services.input.input_type import InputType
+from services.event_service import EventBus
+from services.input.input_type import InputType
 
 T = TypeVar("T", bound=InputType)
 

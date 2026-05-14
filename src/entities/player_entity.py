@@ -1,11 +1,11 @@
 from arcade import Texture
 
-from src.entities.base_entity import BaseEntity
-from src.services.event_service import EventBus
-from src.settings.registered_gameplay_events import PlayerAttackedMeleeEvent
-from src.services.input.settings.registered_input_events import PlayerAttackInputEvent, PlayerMoveInputEvent
-from src.world.systems.combat.entity_stats import StatDefinition
-from src.world.systems.movement.movement_events import EntityMoveEvent
+from entities.base_entity import BaseEntity
+from services.event_service import EventBus
+from settings.registered_gameplay_events import PlayerAttackedMeleeEvent
+from services.input.settings.registered_input_events import PlayerAttackInputEvent, PlayerMoveInputEvent
+from world.systems.combat.entity_stats import StatDefinition
+from world.systems.movement.movement_events import EntityMoveEvent
 
 
 class Player(BaseEntity):

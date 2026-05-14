@@ -1,6 +1,6 @@
 import arcade
 import arcade.gui
-from src.ui.widgets.score_widget import ScoreWidget
+from ui.widgets.score_widget import ScoreWidget
 
 class GameHud(arcade.gui.UIAnchorLayout):
     def __init__(self,config: list[dict]):

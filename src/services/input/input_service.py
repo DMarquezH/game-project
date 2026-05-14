@@ -1,13 +1,13 @@
 from typing import Dict, Set
 
-from src.core.service_container import Service
-from src.services.event_service import EventBus
-from src.services.input.game_input import GameInput, InputSignature
-from src.services.input.input_action import InputAction
-from src.services.input.input_binding import InputTrigger, InputBinding, ActiveInput
-from src.services.input.input_context import InputContext
-from src.services.input.input_type import InputType
-from src.services.input.util.composite_axis import CompositeAxis
+from core.service_container import Service
+from services.event_service import EventBus
+from services.input.game_input import GameInput, InputSignature
+from services.input.input_action import InputAction
+from services.input.input_binding import InputTrigger, InputBinding, ActiveInput
+from services.input.input_context import InputContext
+from services.input.input_type import InputType
+from services.input.util.composite_axis import CompositeAxis
 
 
 class InputService(Service):

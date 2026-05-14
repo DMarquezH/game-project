@@ -1,7 +1,7 @@
 import arcade
 
-from src.services.input.devices.keyboard_device import KeyboardInputDevice
-from src.services.input.util.composite_axis import CompositeAxis
+from services.input.devices.keyboard_device import KeyboardInputDevice
+from services.input.util.composite_axis import CompositeAxis
 
 
 class RegisteredCompositeAxes:

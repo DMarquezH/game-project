@@ -1,7 +1,7 @@
 from typing import Dict
 
-from src.services.input.game_input import InputSignature
-from src.services.input.input_binding import InputBinding
+from services.input.game_input import InputSignature
+from services.input.input_binding import InputBinding
 
 
 class InputContext:

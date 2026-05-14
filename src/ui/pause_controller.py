@@ -1,9 +1,9 @@
-from src.services.event_service import EventBus
-from src.settings.game_resources import GameResources
-from src.services.input.settings.registered_input_events import TogglePauseInputEvent
-from src.ui.grid_button_builder import GridButtons
-from src.ui.base_gui_controller import BaseGuiController
-from src.settings.registered_views import RegisteredViews
+from services.event_service import EventBus
+from settings.game_resources import GameResources
+from services.input.settings.registered_input_events import TogglePauseInputEvent
+from ui.grid_button_builder import GridButtons
+from ui.base_gui_controller import BaseGuiController
+from settings.registered_views import RegisteredViews
 
 
 class PauseController(BaseGuiController):

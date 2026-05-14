@@ -1,18 +1,18 @@
 import arcade.color
 from arcade import Camera2D
 
-from src.core.display import BaseView, GameCamera
-from src.services.event_service import EventBus
-from src.services.input.devices.mouse_device import MouseInputDevice
+from core.display import BaseView, GameCamera
+from services.event_service import EventBus
+from services.input.devices.mouse_device import MouseInputDevice
 
-from src.services.input.input_service import InputService
-from src.services.navigation_service import NavigationService
-from src.services.input.settings.registered_input_contexts import RegisteredInputContexts
-from src.services.input.settings.registered_input_events import TogglePauseInputEvent
+from services.input.input_service import InputService
+from services.navigation_service import NavigationService
+from services.input.settings.registered_input_contexts import RegisteredInputContexts
+from services.input.settings.registered_input_events import TogglePauseInputEvent
 
-from src.world.world import World
-from src.ui.hud_controller import HudController
-from src.ui.pause_controller import PauseController
+from world.world import World
+from ui.hud_controller import HudController
+from ui.pause_controller import PauseController
 
 
 class GameView(BaseView):

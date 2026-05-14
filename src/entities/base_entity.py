@@ -1,7 +1,7 @@
 import arcade
 
-from src.services.event_service import EventBus
-from src.world.systems.combat.entity_stats import EntityStats
+from services.event_service import EventBus
+from world.systems.combat.entity_stats import EntityStats
 
 
 class BaseEntity(arcade.Sprite):

@@ -3,19 +3,19 @@ from typing import Type
 import arcade
 
 from settings.registered_views import RegisteredViews
-from src.core.registry import Registry
-from src.core.display import BaseWindow, BaseView
-from src.services.event_service import EventBus
-from src.core.service_container import ServiceContainer
+from core.registry import Registry
+from core.display import BaseWindow, BaseView
+from services.event_service import EventBus
+from core.service_container import ServiceContainer
 
-from src.services.input.input_service import InputService
-from src.services.navigation_service import NavigationService
-from src.settings.game_constants import GameConstants
-from src.settings.game_resources import GameResources
-from src.services.input.settings.registered_input_contexts import RegisteredInputContexts
+from services.input.input_service import InputService
+from services.navigation_service import NavigationService
+from settings.game_constants import GameConstants
+from settings.game_resources import GameResources
+from services.input.settings.registered_input_contexts import RegisteredInputContexts
 
-from src.views.main_menu_view import MainMenuView
-from src.views.game_view import GameView
+from views.main_menu_view import MainMenuView
+from views.game_view import GameView
 
 
 class MainWindow(BaseWindow):

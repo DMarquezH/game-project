@@ -1,6 +1,6 @@
-from src.services.input.game_input import GameInput, InputSignature
-from src.services.input.input_type import EmptyInput
-from src.services.input.settings.registered_input_devices import RegisteredInputDevice
+from services.input.game_input import GameInput, InputSignature
+from services.input.input_type import EmptyInput
+from services.input.settings.registered_input_devices import RegisteredInputDevice
 
 
 class KeyboardInputSource:

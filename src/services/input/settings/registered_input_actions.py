@@ -1,7 +1,7 @@
-from src.services.event_service import EventBus
-from src.services.input.input_action import InputAction
-from src.services.input.input_type import AxisInput, EmptyInput
-from src.services.input.settings.registered_input_events import *
+from services.event_service import EventBus
+from services.input.input_action import InputAction
+from services.input.input_type import AxisInput, EmptyInput
+from services.input.settings.registered_input_events import *
 
 
 class PlayerMoveInputAction(InputAction):

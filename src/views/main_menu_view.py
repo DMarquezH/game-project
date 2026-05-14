@@ -1,12 +1,12 @@
 import arcade
 from arcade.gui import UIManager
 
-from src.core.display import BaseView
-from src.services.input.input_service import InputService
-from src.services.navigation_service import NavigationService
-from src.settings.game_resources import GameResources
-from src.settings.registered_views import RegisteredViews
-from src.ui.grid_button_builder import GridButtons
+from core.display import BaseView
+from services.input.input_service import InputService
+from services.navigation_service import NavigationService
+from settings.game_resources import GameResources
+from settings.registered_views import RegisteredViews
+from ui.grid_button_builder import GridButtons
 
 
 class MainMenuView(BaseView):

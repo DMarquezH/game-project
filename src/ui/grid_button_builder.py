@@ -1,9 +1,8 @@
 import arcade
 import arcade.gui
 
-from src.ui.widgets.base_button import BaseButton
+from ui.widgets.base_button import BaseButton
 from pathlib import Path
-from PIL import Image
 
 class GridButtons(arcade.gui.UIAnchorLayout):
     """

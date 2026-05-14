@@ -2,8 +2,8 @@ from enum import Enum, auto
 
 from arcade import Texture
 
-from src.entities.base_entity import BaseEntity
-from src.services.event_service import EventBus
+from entities.base_entity import BaseEntity
+from services.event_service import EventBus
 
 
 class EnemyEntity(BaseEntity):

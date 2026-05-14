@@ -1,6 +1,6 @@
 from typing import TypeVar, Dict, Type
 
-from src.core.registry import RegistryException, Freezable
+from core.registry import RegistryException, Freezable
 
 S = TypeVar("S", bound="Service")
 

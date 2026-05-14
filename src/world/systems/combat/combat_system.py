@@ -1,6 +1,6 @@
-from src.services.event_service import EventBus
-from src.settings.registered_gameplay_events import PlayerAttackedMeleeEvent
-from src.world.systems.base_system import BaseSystem
+from services.event_service import EventBus
+from settings.registered_gameplay_events import PlayerAttackedMeleeEvent
+from world.systems.base_system import BaseSystem
 
 
 class CombatSystem(BaseSystem):

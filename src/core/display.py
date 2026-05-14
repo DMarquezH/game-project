@@ -1,10 +1,10 @@
 import arcade
 from arcade import Camera2D
 
-from src.core.service_container import ServiceContainer
-from src.services.input.devices.keyboard_device import KeyboardInputDevice
-from src.services.input.devices.mouse_device import MouseInputDevice
-from src.services.input.input_service import InputService
+from core.service_container import ServiceContainer
+from services.input.devices.keyboard_device import KeyboardInputDevice
+from services.input.devices.mouse_device import MouseInputDevice
+from services.input.input_service import InputService
 
 
 class BaseWindow(arcade.Window):

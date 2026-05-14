@@ -1,8 +1,8 @@
 import arcade
 import arcade.gui
 
-from src.ui.game_hud import GameHud
-from src.ui.base_gui_controller import BaseGuiController
+from ui.game_hud import GameHud
+from ui.base_gui_controller import BaseGuiController
 
 
 class HudController(BaseGuiController):

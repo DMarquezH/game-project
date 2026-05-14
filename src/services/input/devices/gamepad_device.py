@@ -1,6 +1,6 @@
-from src.services.input.game_input import GameInput
-from src.services.input.input_type import EmptyInput, AxisInput, AnalogInput
-from src.services.input.settings.registered_input_devices import RegisteredInputDevice
+from services.input.game_input import GameInput
+from services.input.input_type import EmptyInput, AxisInput, AnalogInput
+from services.input.settings.registered_input_devices import RegisteredInputDevice
 
 
 class GamepadInputSource:

@@ -1,7 +1,7 @@
 from pyglet.math import Vec2
 
-from src.entities.base_entity import BaseEntity
-from src.services.event_service import BaseEvent
+from entities.base_entity import BaseEntity
+from services.event_service import BaseEvent
 
 
 class EntityMoveEvent(BaseEvent):

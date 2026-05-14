@@ -2,9 +2,9 @@ import inspect
 from inspect import Signature
 from typing import TypeVar, List, Type, Dict
 
-from src.core.display import BaseWindow, BaseView
-from src.core.registry import RegistryException, Registry
-from src.core.service_container import Service, ServiceContainer
+from core.display import BaseWindow, BaseView
+from core.registry import RegistryException, Registry
+from core.service_container import Service, ServiceContainer
 
 V = TypeVar("V", bound="BaseView")
 

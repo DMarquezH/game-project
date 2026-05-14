@@ -1,5 +1,5 @@
-from src.services.input.input_context import InputContext
-from src.services.input.settings.registered_input_bindings import *
+from services.input.input_context import InputContext
+from services.input.settings.registered_input_bindings import *
 
 
 class RegisteredInputContexts:

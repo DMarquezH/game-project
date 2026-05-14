@@ -1,7 +1,7 @@
 from typing import List
 
-from src.services.input.game_input import InputSignature
-from src.services.input.input_type import AxisInput
+from services.input.game_input import InputSignature
+from services.input.input_type import AxisInput
 
 
 class CompositeAxis:

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.services.event_service import EventBus
+from services.event_service import EventBus
 
 
 class BaseSystem(ABC):

@@ -1,6 +1,6 @@
 import arcade
-from src.world.level.base_level import BaseLevel
-from src.settings.game_resources import GameResources
+from world.level.base_level import BaseLevel
+from settings.game_resources import GameResources
 
 class LevelLoader:
 

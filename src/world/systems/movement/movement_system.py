@@ -3,11 +3,11 @@ from typing import Dict
 
 import arcade
 
-from src.entities.base_entity import BaseEntity
-from src.services.event_service import EventBus
-from src.world.systems.base_system import BaseSystem
-from src.world.systems.combat.entity_stats import StatDefinition
-from src.world.systems.movement.movement_events import EntityMoveEvent
+from entities.base_entity import BaseEntity
+from services.event_service import EventBus
+from world.systems.base_system import BaseSystem
+from world.systems.combat.entity_stats import StatDefinition
+from world.systems.movement.movement_events import EntityMoveEvent
 
 
 class MovementMode(Enum):
@@ -57,8 +57,8 @@ class MovementSystem(BaseSystem):
         move_dir = event.move_dir
         movement = entity.stats.get(StatDefinition.MOVEMENT_SPEED)
 
-        entity.change_x = movement * move_dir.x
-        entity.change_y = movement * move_dir.y
+        entity.change_x = round(movement * move_dir.x, 2)
+        entity.change_y = round(movement * move_dir.y, 2)
 
     def _apply_friction(self, entity: arcade.Sprite, move_mode: MovementMode):
 

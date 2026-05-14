@@ -1,4 +1,4 @@
-from src.world.level.level2_1 import Level2_1
+from world.level.level2_1 import Level2_1
 
 
 class RegisteredLevels:
