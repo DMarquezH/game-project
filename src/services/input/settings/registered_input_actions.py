@@ -1,7 +1,13 @@
 from services.event_service import EventBus
-from services.input.input_action import InputAction
+from services.input.input_action import InputAction, T
 from services.input.input_type import AxisInput, EmptyInput
 from services.input.settings.registered_input_events import *
+
+
+class ToggleFullscreenInputAction(InputAction):
+
+    def activate(self, event_bus: EventBus, input_value: T):
+        event_bus.dispatch(ToggleFullscreenInputEvent())
 
 
 class PlayerMoveInputAction(InputAction):

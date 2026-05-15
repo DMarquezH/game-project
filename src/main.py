@@ -2,6 +2,7 @@ from typing import Type
 
 import arcade
 
+from services.input.settings.registered_input_events import ToggleFullscreenInputEvent
 from settings.registered_views import RegisteredViews
 from core.registry import Registry
 from core.display import BaseWindow, BaseView
@@ -29,7 +30,14 @@ class MainWindow(BaseWindow):
             GameConstants.WINDOW_TITLE
         )
 
-        self.service_container = service_container
+        self.center_window()
+
+    def init(self):
+        event_bus = self.service_container.get(EventBus)
+        event_bus.subscribe(ToggleFullscreenInputEvent, self._toggle_fullscreen)
+
+    def _toggle_fullscreen(self, _: ToggleFullscreenInputEvent):
+        self.set_fullscreen(not self.fullscreen)
 
 
 def register_views(view_registry: Registry[Type[BaseView]]):
@@ -58,8 +66,15 @@ def init_services(service_container: ServiceContainer, window: MainWindow, view_
 def start_game(service_container: ServiceContainer):
 
     nav_service = service_container.get(NavigationService)
-    if not nav_service: raise RuntimeError(f"Required service '{NavigationService.__name__}' is not registered!")
+    input_service = service_container.get(InputService)
 
+    if not nav_service:
+        raise RuntimeError(f"Required service '{NavigationService.__name__}' is not registered!")
+
+    if not input_service:
+        raise RuntimeError(f"Required service '{InputService.__name__}' is not registered!")
+
+    input_service.enable_context(RegisteredInputContexts.GENERAL)
     nav_service.navigate("main_menu")
 
 def run_game():
@@ -74,6 +89,8 @@ def run_game():
 
     register_views(view_registry)
     init_services(service_container, window, view_registry)
+
+    window.init()
 
     start_game(service_container)
 

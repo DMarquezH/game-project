@@ -9,6 +9,16 @@ from services.input.settings.registered_input_actions import *
 
 class RegisteredInputBindings:
 
+    ### GENERAL ###
+
+    TOGGLE_FULLSCREEN = SimpleInputBinding(
+        KeyboardInputDevice.signature_from_key(
+            arcade.key.F11
+        ),
+        ToggleFullscreenInputAction(),
+        InputTrigger.PRESS
+    )
+
     ### GAMEPLAY ###
 
     PLAYER_MOVE_WASD = CompositeAxisInputBinding(
