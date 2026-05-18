@@ -4,12 +4,15 @@ from services.input.settings.registered_input_bindings import *
 
 class RegisteredInputContexts:
 
+    GENERAL = InputContext("general")
     DEBUG = InputContext("debug")
     GAMEPLAY = InputContext("gameplay")
     PAUSE = InputContext("pause")
 
     @staticmethod
     def init():
+
+        RegisteredInputContexts.GENERAL.bind(RegisteredInputBindings.TOGGLE_FULLSCREEN)
 
         RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.PLAYER_MOVE_WASD)
         RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.PLAYER_MOVE_ARROWS)

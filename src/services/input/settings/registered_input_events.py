@@ -3,6 +3,10 @@ from pyglet.math import Vec2
 from services.event_service import BaseEvent
 
 
+class ToggleFullscreenInputEvent(BaseEvent):
+    pass
+
+
 class PlayerMoveInputEvent(BaseEvent):
 
     def __init__(self, move_dir: Vec2):
@@ -18,9 +22,7 @@ class PlayerAttackInputEvent(BaseEvent):
 
 
 class TogglePauseInputEvent(BaseEvent):
-
-    def __init__(self):
-        super().__init__()
+    pass
 
 
 class ToggleDebugInputEvent(BaseEvent):

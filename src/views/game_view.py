@@ -63,6 +63,12 @@ class GameView(BaseView):
 
         self.world.dispose()
 
+    def on_resize(self, width: int, height: int):
+        super().on_resize(width, height)
+
+        self.world_camera.cam.match_window()
+        self.ui_camera.match_window()
+
     def on_update(self, dt: float):
         super().on_update(dt)
 
