@@ -14,6 +14,9 @@ class BaseSystem(ABC):
 
     def update(self):
         pass
+    
+    def on_update(self, delta_time: float):
+        pass
 
     @abstractmethod
     def dispose(self):

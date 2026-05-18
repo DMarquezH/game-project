@@ -27,3 +27,9 @@ class ToggleDebugInputEvent(BaseEvent):
 
     def __init__(self):
         super().__init__()
+
+class ViewportChangedEvent(BaseEvent):  # no se si esto deberia ir aqui pero como no rompe nada pues lo dejo de mientras
+    def __init__(self, width: float, height: float):
+        super().__init__()
+        self.width = width
+        self.height = height

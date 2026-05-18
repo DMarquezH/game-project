@@ -14,7 +14,9 @@ from world.systems.base_system import BaseSystem
 from world.systems.movement.movement_system import MovementSystem, MovementMode
 from world.level.base_level import BaseLevel
 from world.level.level_loader import LevelLoader
-
+from world.systems.enemy_wave_system import EnemyWaveSystem
+from entities.enemies.melee_enemy import MeleeEnemy
+from world.systems.wave_definition import WaveDefinition, EnemySpawnEntry
 
 class World:
 
@@ -45,9 +47,11 @@ class World:
 
         movement_system = MovementSystem(self.event_bus)
         combat_system = CombatSystem(self.event_bus)
+        wave_system     = EnemyWaveSystem(self.event_bus)
 
         self.systems[MovementSystem] = movement_system
         self.systems[CombatSystem] = combat_system
+        self.systems[EnemyWaveSystem]  = wave_system
 
         for system in self.systems.values():
             system.init()
@@ -63,6 +67,8 @@ class World:
         self._init_scene(data)
         self._init_player(data)
         self._init_physics(data)
+        self._init_pathfinding(data)
+        self._init_wave_system(data)
 
     def _unload(self) -> None:
 
@@ -81,6 +87,10 @@ class World:
         ### SCENE ###
 
         self.scene.add_sprite_list_after("player", "Floor")
+
+        ### ENEMIGOS ###
+
+        self.scene.add_sprite_list_after("Enemies", "Floor")
 
     def _init_player(self, data: LevelLoader):
 
@@ -102,18 +112,40 @@ class World:
         walls = [self.scene[name] for name in data.collision_layers]
         self.physics = PhysicsEngineSimple(self.player, walls, )
 
+    def _init_pathfinding(self, data: LevelLoader):
+        self.barrier_list = data.barrier_list
+
+    def _init_wave_system(self, data: LevelLoader):
+        waves = [
+            WaveDefinition(entries=[EnemySpawnEntry(MeleeEnemy, 5)], spawn_interval=1.5),
+        ]
+
+        wave_system: EnemyWaveSystem = self.systems.get(EnemyWaveSystem)
+        wave_system.setup(
+            waves = waves,
+            player = self.player,
+            scene = self.scene,
+            movement_system = self.systems.get(MovementSystem),
+            barrier_list = self.barrier_list,
+        )
+
     def _subscribe_events(self):
         self.event_bus.subscribe(ToggleDebugInputEvent, self.toggle_debug)
 
     def _unsubscribe_events(self):
         self.event_bus.unsubscribe(ToggleDebugInputEvent, self.toggle_debug)
 
-    def update(self):
+    def update(self, delta_time: float):
 
         self.physics.update()
-
+        self.scene["Enemies"].update()
+        
         for system in self.systems.values():
             system.update()
+            system.on_update(delta_time)
+        
+        for enemy in self.scene["Enemies"]:  # ← en vez de .on_update()
+            enemy.on_update(delta_time)
 
     def draw(self):
 

@@ -9,7 +9,7 @@ from services.input.input_service import InputService
 from services.navigation_service import NavigationService
 from services.input.settings.registered_input_contexts import RegisteredInputContexts
 from services.input.settings.registered_input_events import TogglePauseInputEvent
-
+from services.input.settings.registered_input_events import ViewportChangedEvent
 from world.world_module import World
 from ui.hud_controller import HudController
 from ui.pause_controller import PauseController
@@ -49,6 +49,7 @@ class GameView(BaseView):
 
         self.background_color = arcade.color.BLACK
         self.hud.enable()
+        self.event_bus.dispatch(ViewportChangedEvent(self.window.width, self.window.height))
 
     def on_hide_view(self):
 
@@ -66,7 +67,7 @@ class GameView(BaseView):
         super().on_update(dt)
 
         if not self.pause_menu.is_enabled():
-            self.world.update()
+            self.world.update(dt)
             self.world_camera.update(dt)
 
     def on_draw(self):
