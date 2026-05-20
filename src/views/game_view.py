@@ -8,7 +8,10 @@ from services.input.devices.mouse_device import MouseInputDevice
 from services.input.input_service import InputService
 from services.navigation_service import NavigationService
 from services.input.settings.registered_input_contexts import RegisteredInputContexts
-from services.input.settings.registered_input_events import TogglePauseInputEvent
+from services.input.settings.registered_input_events import TogglePauseInputEvent, ToggleShopInputEvent
+from settings.registered_gameplay_events import ToggleShopEvent, RerollShopEvent
+from ui.shop_controller import ShopController
+from world.systems.shop_system import ShopInstance
 from services.input.settings.registered_input_events import ViewportChangedEvent
 from world.world_module import World
 from ui.hud_controller import HudController
@@ -27,6 +30,7 @@ class GameView(BaseView):
         self.world = World(event_bus)
         self.hud = HudController()
         self.pause_menu = PauseController(self, event_bus)
+        self.shop_menu = ShopController(event_bus)
 
         self.world_camera = GameCamera(
             follow_target=self.world.player,
@@ -38,9 +42,13 @@ class GameView(BaseView):
 
     def _subscribe_listeners(self):
         self.event_bus.subscribe(TogglePauseInputEvent, self.on_toggle_pause)
+        self.event_bus.subscribe(ToggleShopEvent, self.on_toggle_shop)
+        self.event_bus.subscribe(RerollShopEvent, self.on_reroll_shop)
 
     def _unsubscribe_listeners(self):
         self.event_bus.unsubscribe(TogglePauseInputEvent, self.on_toggle_pause)
+        self.event_bus.unsubscribe(ToggleShopEvent, self.on_toggle_shop)
+        self.event_bus.unsubscribe(RerollShopEvent, self.on_reroll_shop)
 
     def on_show_view(self):
 
@@ -72,7 +80,7 @@ class GameView(BaseView):
     def on_update(self, dt: float):
         super().on_update(dt)
 
-        if not self.pause_menu.is_enabled():
+        if not self.pause_menu.is_enabled() and not self.shop_menu.is_enabled():
             self.world.update(dt)
             self.world_camera.update(dt)
 
@@ -87,6 +95,9 @@ class GameView(BaseView):
 
         if self.pause_menu.is_enabled():
             self.pause_menu.draw()
+
+        if self.shop_menu.is_enabled():
+            self.shop_menu.draw()
 
     def on_toggle_pause(self, _: TogglePauseInputEvent):
 
@@ -123,3 +134,34 @@ class GameView(BaseView):
         )
 
         self.input_service.register_press(inp)
+
+        # TEMP
+
+    def on_toggle_shop(self, event: ToggleShopEvent):
+
+        if self.shop_menu.is_enabled():
+            self.deactivate_shop()
+        else:
+            self.activate_shop(event.shop)
+
+    def on_reroll_shop(self,event: RerollShopEvent):
+        self.shop_menu.reload_items()
+
+    def activate_shop(self, shop: ShopInstance):
+
+        self.input_service.enable_context(RegisteredInputContexts.SHOP)
+
+        self.input_service.disable_context(RegisteredInputContexts.GAMEPLAY)
+        self.input_service.disable_context(RegisteredInputContexts.DEBUG)
+
+        self.shop_menu.load_shop(shop)
+        self.shop_menu.enable()
+
+    def deactivate_shop(self):
+
+        self.input_service.enable_context(RegisteredInputContexts.GAMEPLAY)
+        self.input_service.enable_context(RegisteredInputContexts.DEBUG)
+
+        self.input_service.disable_context(RegisteredInputContexts.SHOP)
+
+        self.shop_menu.deload_shop()

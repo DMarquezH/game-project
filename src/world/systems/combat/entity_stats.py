@@ -4,27 +4,27 @@ from typing import Dict
 
 class StatDefinition(Enum):
 
-    MAX_HEALTH = auto()
-    HEALTH = auto()
+    MAX_HEALTH = "max_health"
+    HEALTH = "health"
 
-    DEFENSE = auto()
-    ARMOR = auto()
+    DEFENSE = "defense"
+    ARMOR = "armor"
 
-    MOVEMENT_SPEED = auto()
+    MOVEMENT_SPEED = "movement_speed"
 
-    ATTACK_DAMAGE = auto()
-    ATTACK_SPEED = auto()
-    ATTACK_KNOCKBACK = auto()
+    ATTACK_DAMAGE = "attack_damage"
+    ATTACK_SPEED = "attack_speed"
+    ATTACK_KNOCKBACK = "attack_knockback"
 
-    CRIT_CHANCE = auto()
-    CRIT_DAMAGE_MULTI = auto()
+    CRIT_CHANCE = "crit_chance"
+    CRIT_DAMAGE_MULTI = "crit_damage_multi"
 
-    ATTACK_RANGE = auto()
-    SWING_AMPLITUDE = auto()
+    ATTACK_RANGE = "attack_range"
+    SWING_AMPLITUDE = "swing_amplitude"
 
-    SHOT_SPEED = auto()
-    SHOT_SPREAD = auto()
-    SHOT_PIERCE = auto()
+    SHOT_SPEED = "shot_speed"
+    SHOT_SPREAD = "shot_spread"
+    SHOT_PIERCE = "shot_pierce"
 
 
 class EntityStats:
@@ -51,3 +51,9 @@ class EntityStats:
         if not stat_value: return
 
         self.set(stat_def, stat_value - decrease)
+
+    @staticmethod
+    def resolve(stat:str) -> StatDefinition | None:
+        for stat_enum in StatDefinition:
+            if stat_enum.value == stat: return stat_enum
+        return None

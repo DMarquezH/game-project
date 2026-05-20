@@ -20,6 +20,7 @@ class GameResources:
         add_resource_handle("sounds", assets_path / "sounds")
         add_resource_handle("levels", assets_path / "levels")
         add_resource_handle("fonts", assets_path / "fonts")
+        add_resource_handle("data", assets_path / "data")
 
         cls._initialized = True
 

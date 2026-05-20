@@ -58,3 +58,13 @@ class RegisteredInputBindings:
         ToggleDebugInputAction(),
         InputTrigger.PRESS
     )
+
+    ### SHOP TEMP ###
+
+    TOGGLE_SHOP = SimpleInputBinding(
+        KeyboardInputDevice.signature_from_key(
+            arcade.key.P
+        ),
+        ToggleShopInputAction(),
+        InputTrigger.PRESS
+    )

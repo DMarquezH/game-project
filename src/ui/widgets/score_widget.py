@@ -16,5 +16,8 @@ class ScoreWidget(arcade.gui.UIBoxLayout):
         self.add(self.image_widget)
         self.add(self.label_widget)
 
+        self.width = self.image_widget.width + self.label_widget.width + self._space_between
+        self.height = self.image_widget.height
+
     def set_text(self,text:str):
         self.label_widget.text = text

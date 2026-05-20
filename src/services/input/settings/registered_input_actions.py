@@ -42,3 +42,7 @@ class ToggleDebugInputAction(InputAction):
 
     def activate(self, event_bus: EventBus, input_value: EmptyInput):
         event_bus.dispatch(ToggleDebugInputEvent())
+
+class ToggleShopInputAction(InputAction):
+    def activate(self, event_bus: EventBus, input_value: EmptyInput):
+        event_bus.dispatch(ToggleShopInputEvent())

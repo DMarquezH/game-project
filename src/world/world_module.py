@@ -1,22 +1,32 @@
-from typing import Dict, Type, Set
+from typing import Dict, Type, Set, List
 
 import arcade
 from arcade import Scene, PhysicsEngineSimple
+from pip._internal.resolution.resolvelib import candidates
 
 from entities.base_entity import BaseEntity
-from services.event_service import EventBus
+from entities.item_entity import ItemEntity
+from services.event_service import EventBus, BaseEvent
 from entities.player_entity import Player
 from settings.game_resources import GameResources
-from services.input.settings.registered_input_events import ToggleDebugInputEvent
+from services.input.settings.registered_input_events import ToggleDebugInputEvent, ToggleShopInputEvent
+from settings.registered_gameplay_events import RerollShopEvent, ToggleShopEvent, BuyItemEvent
 from world.level.registered_levels import RegisteredLevels
+from world.systems import shop_system
 from world.systems.combat.combat_system import CombatSystem
 from world.systems.base_system import BaseSystem
 from world.systems.movement.movement_system import MovementSystem, MovementMode
 from world.level.base_level import BaseLevel
 from world.level.level_loader import LevelLoader
+
+import json
+import random
+
+from world.systems.shop_system import ShopInstance
 from world.systems.enemy_wave_system import EnemyWaveSystem
 from entities.enemies.melee_enemy import MeleeEnemy
 from world.systems.wave_definition import WaveDefinition, EnemySpawnEntry
+
 
 class World:
 
@@ -31,7 +41,7 @@ class World:
 
         self.entities: Set[BaseEntity] = set()
         self.systems: Dict[Type[BaseSystem], BaseSystem] = {}
-
+        self.items : List[ItemEntity] = []
         self.debug = False
 
         self.init()
@@ -40,7 +50,7 @@ class World:
 
         self._init_systems()
         self._subscribe_events()
-
+        self.load_items()
         self.load_level(RegisteredLevels.CEMENTERY)
 
     def _init_systems(self):
@@ -131,19 +141,25 @@ class World:
 
     def _subscribe_events(self):
         self.event_bus.subscribe(ToggleDebugInputEvent, self.toggle_debug)
+        self.event_bus.subscribe(ToggleShopInputEvent, self.open_shop)
+        self.event_bus.subscribe(RerollShopEvent, self.on_shop_reroll)
+        self.event_bus.subscribe(BuyItemEvent,self.update_stats)
 
     def _unsubscribe_events(self):
         self.event_bus.unsubscribe(ToggleDebugInputEvent, self.toggle_debug)
+        self.event_bus.unsubscribe(ToggleShopInputEvent, self.open_shop)
+        self.event_bus.unsubscribe(RerollShopEvent, self.on_shop_reroll)
+        self.event_bus.unsubscribe(BuyItemEvent,self.update_stats)
 
     def update(self, delta_time: float):
 
         self.physics.update()
         self.scene["Enemies"].update()
-        
+
         for system in self.systems.values():
             system.update()
             system.on_update(delta_time)
-        
+
         for enemy in self.scene["Enemies"]:  # ← en vez de .on_update()
             enemy.on_update(delta_time)
 
@@ -169,3 +185,38 @@ class World:
 
         for system in self.systems.values():
             system.dispose()
+
+    def load_items(self):
+        list = json.load(open(GameResources.get("data") / "items.json"))
+        for item in list:
+            aux_item = ItemEntity(item["texture"],item["name"],item["description"],item["cost"],item["value"],item["stat"])
+            self.items.append(aux_item)
+
+    def randomize_items(self,used_items: list[ItemEntity] | None = None,count = 3) -> List[ItemEntity]:
+        candidatos =[]
+        if used_items is None: used_items = []
+
+        for item in self.items:
+            if item not in used_items:
+                candidatos.append(item)
+        final_count = min(count,len(candidatos))
+
+        return random.sample(candidatos,final_count)
+
+    def on_shop_reroll(self, event: RerollShopEvent):
+        shop = event.shop
+        shop.reroll()
+        shop.load_new_items(self.randomize_items(shop.used_items))
+
+    def open_shop(self, _: ToggleShopInputEvent):
+
+        items = self.randomize_items()
+        shop = ShopInstance(self.event_bus, items)
+
+        self.event_bus.dispatch(ToggleShopEvent(shop))
+        # Cambiar evento
+    def update_stats(self, event: BaseEvent):
+        pass
+        # El evento tendra: El item dodne sacamos la stat y el valor
+        # mediante: self.player.stats.increase( LO QUE SEA)
+

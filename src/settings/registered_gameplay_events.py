@@ -1,6 +1,10 @@
+from typing import List
+
 from pyglet.math import Vec2
 
+from entities.item_entity import ItemEntity
 from services.event_service import BaseEvent
+from world.systems.shop_system import ShopInstance
 
 
 class PlayerAttackedMeleeEvent(BaseEvent):
@@ -13,3 +17,24 @@ class PlayerAttackedMeleeEvent(BaseEvent):
         self.attack_range = attack_range
         self.amplitude = amplitude
         self.damage = damage
+
+
+class ToggleShopEvent(BaseEvent):
+
+    def __init__(self, shop):
+        super().__init__()
+        self.shop = shop
+
+
+class RerollShopEvent(BaseEvent):
+
+    def __init__(self, shop: ShopInstance):
+        super().__init__()
+        self.shop = shop
+
+class BuyItemEvent(BaseEvent):
+
+    def __init__(self, item: ItemEntity):
+        super().__init__()
+        #self.shop = shop
+        self.item = item

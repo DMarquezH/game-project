@@ -8,7 +8,7 @@ class RegisteredInputContexts:
     DEBUG = InputContext("debug")
     GAMEPLAY = InputContext("gameplay")
     PAUSE = InputContext("pause")
-
+    SHOP = InputContext("shop")
     @staticmethod
     def init():
 
@@ -22,3 +22,6 @@ class RegisteredInputContexts:
         RegisteredInputContexts.PAUSE.bind(RegisteredInputBindings.TOGGLE_PAUSE)
 
         RegisteredInputContexts.DEBUG.bind(RegisteredInputBindings.TOGGLE_DEBUG)
+
+        RegisteredInputContexts.SHOP.bind(RegisteredInputBindings.TOGGLE_SHOP)
+        RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.TOGGLE_SHOP)

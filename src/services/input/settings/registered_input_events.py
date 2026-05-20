@@ -1,5 +1,6 @@
 from pyglet.math import Vec2
 
+from entities.item_entity import ItemEntity
 from services.event_service import BaseEvent
 
 
@@ -26,6 +27,10 @@ class TogglePauseInputEvent(BaseEvent):
 
 
 class ToggleDebugInputEvent(BaseEvent):
+    pass
+
+class ToggleShopInputEvent(BaseEvent):
+    pass
 
     def __init__(self):
         super().__init__()
