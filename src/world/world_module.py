@@ -15,6 +15,7 @@ from world.level.registered_levels import RegisteredLevels
 from world.systems import shop_system
 from world.systems.combat.combat_system import CombatSystem
 from world.systems.base_system import BaseSystem
+from world.systems.combat.entity_stats import StatDefinition, EntityStats
 from world.systems.movement.movement_system import MovementSystem, MovementMode
 from world.level.base_level import BaseLevel
 from world.level.level_loader import LevelLoader
@@ -42,6 +43,7 @@ class World:
         self.entities: Set[BaseEntity] = set()
         self.systems: Dict[Type[BaseSystem], BaseSystem] = {}
         self.items : List[ItemEntity] = []
+        self.coins : int = 0
         self.debug = False
 
         self.init()
@@ -104,11 +106,9 @@ class World:
 
     def _init_player(self, data: LevelLoader):
 
-        player_texture = arcade.load_texture(
-            GameResources.get("textures") / "entity" / "player_highres.png"
-        )
+        player_spritesheet = arcade.load_spritesheet(GameResources.get("textures") / "entity" / "spritesheet_player.png")
 
-        self.player = Player(self.event_bus, player_texture, 0.125)
+        self.player = Player(self.event_bus, player_spritesheet, scale=0.3)
         self.player.position = data.player_start
 
         self.scene.add_sprite("player", self.player)
@@ -155,6 +155,7 @@ class World:
 
         self.physics.update()
         self.scene["Enemies"].update()
+        self.player.update_animation()
 
         for system in self.systems.values():
             system.update()
@@ -162,7 +163,6 @@ class World:
 
         for enemy in self.scene["Enemies"]:  # ← en vez de .on_update()
             enemy.on_update(delta_time)
-
     def draw(self):
 
         self.scene.draw()
@@ -215,8 +215,13 @@ class World:
 
         self.event_bus.dispatch(ToggleShopEvent(shop))
         # Cambiar evento
-    def update_stats(self, event: BaseEvent):
-        pass
+    def update_stats(self, event: BuyItemEvent):
+        price = event.item.cost
+        if price <= self.coins:
+            self.coins -= price
+            self.player.stats.increase(EntityStats.resolve(event.item.stat), event.item.value)
+            self.event_bus.dispatch(ToggleShopEvent(event.shop))
+
         # El evento tendra: El item dodne sacamos la stat y el valor
         # mediante: self.player.stats.increase( LO QUE SEA)
 

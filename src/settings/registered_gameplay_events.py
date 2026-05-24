@@ -34,7 +34,7 @@ class RerollShopEvent(BaseEvent):
 
 class BuyItemEvent(BaseEvent):
 
-    def __init__(self, item: ItemEntity):
+    def __init__(self, item: ItemEntity, shop:ShopInstance):
         super().__init__()
-        #self.shop = shop
+        self.shop = shop
         self.item = item

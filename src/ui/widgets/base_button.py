@@ -18,7 +18,7 @@ class BaseButton(gui.UITextureButton):
         action(callabe,optional): function to execute when te button is clicked. Defaults to None.
     """
 
-    def __init__(self,sheet:Path,sound:Path,x=0, y=0, image_width=0, image_height=0, count=0, columns=0,  action=None,scale=1):
+    def __init__(self,sheet:Path,sound:Path,x=0, y=0, image_width=0, image_height=0, count=0, columns=0,  action=None,scale=1, widget: gui.UIWidget | None =None):
         tex_normal = None
         tex_hover = None
         self.sound = None
@@ -31,6 +31,9 @@ class BaseButton(gui.UITextureButton):
 
             super().__init__(width=image_width*scale,height=image_height*scale,x=x,y=y,texture=tex_normal,texture_hovered=tex_hover)
             self.action = action
+
+        if widget:
+            self.add(child=widget,anchor_x="center",anchor_y="center")
 
         if sound.is_file() and sound.suffix in [".wav",".mp3"]:
             self.sound = arcade.Sound(sound)

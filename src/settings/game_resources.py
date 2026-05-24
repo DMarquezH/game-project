@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from arcade import load_font
 from arcade.resources import add_resource_handle, resolve
 
 
@@ -22,6 +23,7 @@ class GameResources:
         add_resource_handle("fonts", assets_path / "fonts")
         add_resource_handle("data", assets_path / "data")
 
+        load_font(GameResources.get("fonts") / "BlackOpsOne-Regular.ttf")
         cls._initialized = True
 
     @staticmethod

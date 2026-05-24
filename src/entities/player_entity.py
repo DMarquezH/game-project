@@ -1,4 +1,5 @@
-from arcade import Texture
+import arcade
+from arcade import Texture, SpriteSheet
 
 from entities.base_entity import BaseEntity
 from services.event_service import EventBus
@@ -16,21 +17,36 @@ class Player(BaseEntity):
     DEFAULT_MELEE_AMPLITUDE = 135
     DEFAULT_MELEE_DAMAGE = 35
 
-    def __init__(self, event_bus: EventBus, texture: Texture, scale: float):
+    def __init__(self, event_bus: EventBus, sheet: SpriteSheet, scale: float):
         super().__init__(event_bus)
 
-        self.texture = texture
         self.scale = scale
 
         self.melee_range = Player.DEFAULT_MELEE_RANGE
 
-        # self.stats = EntityStats()
 
+        self.sprite_sheet= sheet
+        self.textures: list[Texture] = self.sprite_sheet.get_texture_grid((209,270),6,17)
+
+
+        #Definicion de texturas
+        self.left_frames = [12,13,14,15]
+        self.right_frames = [8,9,10,11]
+        self.up_frames = [4,5,6,7]
+        self.down_frames = [0,1,2,3]
+        self.static_frame = 16
+
+        self.anim_time = 0
+        self.anim_fps = 1/6
+        self.moving_frame = 0
+
+        self.texture = self.textures[self.static_frame]
         self._init_stats()
         self._subscribe_events()
 
     def _init_stats(self):
         self.stats.set(StatDefinition.MOVEMENT_SPEED, self.DEFAULT_MOVEMENT_SPEED)
+        self.stats.set(StatDefinition.ATTACK_DAMAGE,self.DEFAULT_MELEE_DAMAGE)
 
     def _subscribe_events(self):
         self.event_bus.subscribe(PlayerMoveInputEvent, self._move)
@@ -65,3 +81,31 @@ class Player(BaseEntity):
 
     def dispose(self):
         self._unsubscribe_events()
+
+    def update_animation(self, delta_time: float = 1 / 60, *args, **kwargs) -> None:
+        moving = abs(self.change_x) >0.1 or abs(self.change_y) >0.1
+        if moving:
+            if abs(self.change_x) > abs(self.change_y):
+                if self.change_x > 0:
+                    current_frames = self.right_frames
+                else:
+                    current_frames = self.left_frames
+            else:
+                if self.change_y > 0:
+                    current_frames = self.up_frames
+                else:
+                    current_frames = self.down_frames
+
+            self.anim_time += delta_time
+
+            while self.anim_time >= self.anim_fps:
+                self.anim_time -= self.anim_fps
+                self.moving_frame = (self.moving_frame + 1) % len(current_frames)
+
+            self.texture = self.textures[current_frames[self.moving_frame]]
+
+        else:
+            self.anim_time = 0
+            self.moving_frame = 0
+
+            self.texture = self.textures[self.static_frame]

@@ -11,7 +11,7 @@ class ScoreWidget(arcade.gui.UIBoxLayout):
         self.image_texture = arcade.load_texture(image)
         self.image_widget = arcade.gui.UIImage(texture=self.image_texture,width=self.image_texture.width/4,height=self.image_texture.height/4)
 
-        self.label_widget = arcade.gui.UILabel(text= text,font_size=20)
+        self.label_widget = arcade.gui.UILabel(text= text,font_size=18,font_name="Black Ops One")
 
         self.add(self.image_widget)
         self.add(self.label_widget)
