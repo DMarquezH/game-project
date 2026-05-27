@@ -19,17 +19,20 @@ from world.systems.combat.entity_stats import StatDefinition, EntityStats
 from world.systems.movement.movement_system import MovementSystem, MovementMode
 from world.level.base_level import BaseLevel
 from world.level.level_loader import LevelLoader
+from world.level.level_events import LevelChangeRequestEvent, LevelChangedEvent
 
 import json
 import random
 
 from world.systems.shop_system import ShopInstance
-from world.systems.enemy_wave_system import EnemyWaveSystem
+from world.systems.enemy_wave_system import EnemyWaveSystem, WaveCompleteEvent, AllWavesCompleteEvent
 from entities.enemies.melee_enemy import MeleeEnemy
 from world.systems.wave_definition import WaveDefinition, EnemySpawnEntry
 
 
 class World:
+
+    SHOP_DELAY_SECONDS = 1.5
 
     def __init__(self, event_bus: EventBus):
 
@@ -46,6 +49,17 @@ class World:
         self.coins : int = 0
         self.debug = False
 
+        # --- Progresión de niveles ---
+        self._level_sequence: List[BaseLevel] = [
+            RegisteredLevels.CEMENTERY,
+        ]
+        self._current_level_index: int = 0
+
+        self._completed_waves: int = 0
+        self._shop_delay_timer: float = 0.0
+        self._shop_delay_active: bool = False
+        self._pending_level_change: bool = False
+
         self.init()
 
     def init(self):
@@ -53,7 +67,7 @@ class World:
         self._init_systems()
         self._subscribe_events()
         self.load_items()
-        self.load_level(RegisteredLevels.CEMENTERY)
+        self.load_level(self._level_sequence[self._current_level_index])
 
     def _init_systems(self):
 
@@ -70,6 +84,11 @@ class World:
 
     def load_level(self, level: BaseLevel) -> None:
 
+        saved_stats: EntityStats | None = None
+        saved_coins = self.coins
+        if self.player:
+            saved_stats = self.player.stats
+
         if self.current_level:
             self._unload()
 
@@ -82,7 +101,27 @@ class World:
         self._init_pathfinding(data)
         self._init_wave_system(data)
 
+        if saved_stats is not None:
+            self.player.stats = saved_stats
+        self.coins = saved_coins
+
+        # Resetear control de oleadas para el nuevo nivel
+        self._completed_waves = 0
+        self._shop_delay_timer = 0.0
+        self._shop_delay_active = False
+        self._pending_level_change = False
+
     def _unload(self) -> None:
+
+        wave_system: EnemyWaveSystem = self.systems.get(EnemyWaveSystem)
+        wave_system.dispose()
+
+        movement_system: MovementSystem = self.systems.get(MovementSystem)
+        for entity in self.entities:
+            movement_system.remove_entity(entity)
+
+        for entity in self.entities:
+            entity.dispose()
 
         self.scene = None
         self.player = None
@@ -126,9 +165,7 @@ class World:
         self.barrier_list = data.barrier_list
 
     def _init_wave_system(self, data: LevelLoader):
-        waves = [
-            WaveDefinition(entries=[EnemySpawnEntry(MeleeEnemy, 5)], spawn_interval=1.5),
-        ]
+        waves = self._generate_waves()
 
         wave_system: EnemyWaveSystem = self.systems.get(EnemyWaveSystem)
         wave_system.setup(
@@ -139,19 +176,94 @@ class World:
             barrier_list = self.barrier_list,
         )
 
+    def _generate_waves(self):
+        waves = []
+        for i in range(10):
+            wave_number = i + 1  # 1-indexed para la lógica de diseño
+
+            enemy_count = 3 + (wave_number * 2)
+
+            spawn_interval = max(0.4, 2.0 - (wave_number * 0.15))
+
+            # TODO: Ronda 10 para el jefe
+            # if wave_number == 10:
+            #     entries = [
+            #         EnemySpawnEntry(BossEnemy, 1),
+            #         EnemySpawnEntry(MeleeEnemy, enemy_count // 2),
+            #     ]
+            # else:
+
+            entries = [EnemySpawnEntry(MeleeEnemy, enemy_count)]
+
+            waves.append(WaveDefinition(entries=entries, spawn_interval=spawn_interval))
+
+        return waves
+
     def _subscribe_events(self):
         self.event_bus.subscribe(ToggleDebugInputEvent, self.toggle_debug)
         self.event_bus.subscribe(ToggleShopInputEvent, self.open_shop)
         self.event_bus.subscribe(RerollShopEvent, self.on_shop_reroll)
         self.event_bus.subscribe(BuyItemEvent,self.update_stats)
+        self.event_bus.subscribe(WaveCompleteEvent, self._on_wave_complete)
+        self.event_bus.subscribe(AllWavesCompleteEvent, self._on_all_waves_complete)
+        self.event_bus.subscribe(LevelChangeRequestEvent, self._on_level_change_request)
 
     def _unsubscribe_events(self):
         self.event_bus.unsubscribe(ToggleDebugInputEvent, self.toggle_debug)
         self.event_bus.unsubscribe(ToggleShopInputEvent, self.open_shop)
         self.event_bus.unsubscribe(RerollShopEvent, self.on_shop_reroll)
         self.event_bus.unsubscribe(BuyItemEvent,self.update_stats)
+        self.event_bus.unsubscribe(WaveCompleteEvent, self._on_wave_complete)
+        self.event_bus.unsubscribe(AllWavesCompleteEvent, self._on_all_waves_complete)
+        self.event_bus.unsubscribe(LevelChangeRequestEvent, self._on_level_change_request)
+
+
+    def _on_wave_complete(self, _: WaveCompleteEvent):
+        self._completed_waves += 1
+
+        # Cada 5 rondas tienda
+        if self._completed_waves % 5 == 0:
+            self._shop_delay_active = True
+            self._shop_delay_timer = self.SHOP_DELAY_SECONDS
+
+    def _on_all_waves_complete(self, _: AllWavesCompleteEvent):
+        self._pending_level_change = True
+
+    def _on_level_change_request(self, event: LevelChangeRequestEvent):
+        self.load_level(event.next_level)
+        self.event_bus.dispatch(LevelChangedEvent(event.next_level))
+
+    def _do_level_change(self):
+        self._pending_level_change = False
+
+        next_index = self._current_level_index + 1
+
+        if next_index >= len(self._level_sequence):
+            next_index = 0
+
+        self._current_level_index = next_index
+        next_level = self._level_sequence[next_index]
+
+        self.event_bus.dispatch(LevelChangeRequestEvent(next_level))
+
+    def _open_auto_shop(self):
+        items = self.randomize_items()
+        shop = ShopInstance(self.event_bus, items)
+        self.event_bus.dispatch(ToggleShopEvent(shop))
+
 
     def update(self, delta_time: float):
+
+        if self._shop_delay_active:
+            self._shop_delay_timer -= delta_time
+            if self._shop_delay_timer <= 0.0:
+                self._shop_delay_active = False
+                self._open_auto_shop()
+                return
+
+        if self._pending_level_change and not self._shop_delay_active:
+            self._do_level_change()
+            return  
 
         self.physics.update()
         self.scene["Enemies"].update()
@@ -161,7 +273,7 @@ class World:
             system.update()
             system.on_update(delta_time)
 
-        for enemy in self.scene["Enemies"]:  # ← en vez de .on_update()
+        for enemy in self.scene["Enemies"]:  
             enemy.on_update(delta_time)
     def draw(self):
 
@@ -224,4 +336,3 @@ class World:
 
         # El evento tendra: El item dodne sacamos la stat y el valor
         # mediante: self.player.stats.increase( LO QUE SEA)
-

@@ -10,6 +10,7 @@ from services.navigation_service import NavigationService
 from services.input.settings.registered_input_contexts import RegisteredInputContexts
 from services.input.settings.registered_input_events import TogglePauseInputEvent, ToggleShopInputEvent
 from settings.registered_gameplay_events import ToggleShopEvent, RerollShopEvent
+from world.level.level_events import LevelChangedEvent
 from ui.shop_controller import ShopController
 from world.systems.shop_system import ShopInstance
 from services.input.settings.registered_input_events import ViewportChangedEvent
@@ -44,11 +45,13 @@ class GameView(BaseView):
         self.event_bus.subscribe(TogglePauseInputEvent, self.on_toggle_pause)
         self.event_bus.subscribe(ToggleShopEvent, self.on_toggle_shop)
         self.event_bus.subscribe(RerollShopEvent, self.on_reroll_shop)
+        self.event_bus.subscribe(LevelChangedEvent, self._on_level_changed)
 
     def _unsubscribe_listeners(self):
         self.event_bus.unsubscribe(TogglePauseInputEvent, self.on_toggle_pause)
         self.event_bus.unsubscribe(ToggleShopEvent, self.on_toggle_shop)
         self.event_bus.unsubscribe(RerollShopEvent, self.on_reroll_shop)
+        self.event_bus.unsubscribe(LevelChangedEvent, self._on_level_changed)
 
     def on_show_view(self):
 
@@ -165,3 +168,11 @@ class GameView(BaseView):
         self.input_service.disable_context(RegisteredInputContexts.SHOP)
 
         self.shop_menu.deload_shop()
+
+    def _on_level_changed(self, event: LevelChangedEvent):
+        """Actualiza la cámara para ajustarse a los límites del nuevo nivel."""
+        self.world_camera = GameCamera(
+            follow_target=self.world.player,
+            clamp_rect=self.world.get_level_bounds()
+        )
+        self.world_camera.cam.match_window()

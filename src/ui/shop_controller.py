@@ -5,8 +5,8 @@ from services.event_service import EventBus, BaseEvent
 from services.input.settings.registered_input_events import ToggleShopInputEvent
 from settings.game_resources import GameResources
 from settings.registered_gameplay_events import RerollShopEvent, BuyItemEvent
-from src.ui.base_gui_controller import BaseGuiController
-from src.ui.widgets.score_widget import ScoreWidget
+from ui.base_gui_controller import BaseGuiController
+from ui.widgets.score_widget import ScoreWidget
 from ui.widgets.base_button import BaseButton
 from world.systems.shop_system import ShopInstance
 
