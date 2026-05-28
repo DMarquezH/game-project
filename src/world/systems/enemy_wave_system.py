@@ -9,6 +9,7 @@ from world.systems.base_system import BaseSystem
 from world.systems.movement.movement_system import MovementSystem, MovementMode
 from world.systems.wave_definition import WaveDefinition, EnemySpawnEntry
 from services.input.settings.registered_input_events import ViewportChangedEvent
+from settings.registered_gameplay_events import EntityDeadEvent
 
 
 class WaveCompleteEvent:
@@ -57,9 +58,10 @@ class EnemyWaveSystem(BaseSystem):
         self._scene = scene
         self._movement_system = movement_system
         self._barrier_list = barrier_list
-        self._viewport_w      = 960.0   # valor por defecto hasta recibir el evento
-        self._viewport_h      = 540.0
+        self._viewport_w = 960.0   # valor por defecto hasta recibir el evento
+        self._viewport_h = 540.0
         self.event_bus.subscribe(ViewportChangedEvent, self._on_viewport_changed)
+        self.event_bus.subscribe(EntityDeadEvent, self._on_entity_dead)
         self._start_wave(0)
 
     def _on_viewport_changed(self, event: ViewportChangedEvent) -> None:
@@ -136,10 +138,19 @@ class EnemyWaveSystem(BaseSystem):
         else:
             return (cx + half_w, random.uniform(cy - half_h, cy + half_h))
 
-    def notify_enemy_dead(self, enemy: BaseEnemy) -> None:
-        self._active_enemies.discard(enemy)
-        self._movement_system.remove_entity(enemy)
-        enemy.kill()
+    def _on_entity_dead(self, event) -> None:
+        entity = event.entity
+        if isinstance(entity, BaseEnemy):
+            self._active_enemies.discard(entity)
+            self._movement_system.remove_entity(entity)
+            entity.kill()
+            self._check_wave_complete()
+        elif isinstance(entity, Player):
+            print("GAME OVER")
+            # GameOverEvent() o asi pero me dio pereza
+            entity.kill()
 
     def dispose(self) -> None:
         self.event_bus.unsubscribe(ViewportChangedEvent, self._on_viewport_changed)
+        from settings.registered_gameplay_events import EntityDeadEvent
+        self.event_bus.unsubscribe(EntityDeadEvent, self._on_entity_dead)

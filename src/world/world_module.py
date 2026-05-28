@@ -27,6 +27,7 @@ import random
 from world.systems.shop_system import ShopInstance
 from world.systems.enemy_wave_system import EnemyWaveSystem, WaveCompleteEvent, AllWavesCompleteEvent
 from entities.enemies.melee_enemy import MeleeEnemy
+from entities.enemies.ranged_enemy import RangedEnemy
 from world.systems.wave_definition import WaveDefinition, EnemySpawnEntry
 
 
@@ -100,6 +101,9 @@ class World:
         self._init_physics(data)
         self._init_pathfinding(data)
         self._init_wave_system(data)
+        
+        combat_system: CombatSystem = self.systems.get(CombatSystem)
+        combat_system.setup(self.scene, self.player)
 
         if saved_stats is not None:
             self.player.stats = saved_stats
@@ -142,6 +146,11 @@ class World:
         ### ENEMIGOS ###
 
         self.scene.add_sprite_list_after("Enemies", "Floor")
+        
+        ### COMBATE ###
+        self.scene.add_sprite_list("Projectiles")
+        self.scene.add_sprite_list("MeleeSwipes")
+        self.scene.add_sprite_list("Pickups")
 
     def _init_player(self, data: LevelLoader):
 
@@ -193,7 +202,13 @@ class World:
             #     ]
             # else:
 
-            entries = [EnemySpawnEntry(MeleeEnemy, enemy_count)]
+            melee_count = enemy_count
+            ranged_count = (melee_count // 3) * 2
+
+            entries = [
+                EnemySpawnEntry(MeleeEnemy, melee_count),
+                EnemySpawnEntry(RangedEnemy, ranged_count)
+            ]
 
             waves.append(WaveDefinition(entries=entries, spawn_interval=spawn_interval))
 
@@ -207,6 +222,9 @@ class World:
         self.event_bus.subscribe(WaveCompleteEvent, self._on_wave_complete)
         self.event_bus.subscribe(AllWavesCompleteEvent, self._on_all_waves_complete)
         self.event_bus.subscribe(LevelChangeRequestEvent, self._on_level_change_request)
+        from settings.registered_gameplay_events import EntityDeadEvent, CoinCollectedEvent
+        self.event_bus.subscribe(EntityDeadEvent, self._on_entity_dead)
+        self.event_bus.subscribe(CoinCollectedEvent, self._on_coin_collected)
 
     def _unsubscribe_events(self):
         self.event_bus.unsubscribe(ToggleDebugInputEvent, self.toggle_debug)
@@ -216,6 +234,9 @@ class World:
         self.event_bus.unsubscribe(WaveCompleteEvent, self._on_wave_complete)
         self.event_bus.unsubscribe(AllWavesCompleteEvent, self._on_all_waves_complete)
         self.event_bus.unsubscribe(LevelChangeRequestEvent, self._on_level_change_request)
+        from settings.registered_gameplay_events import EntityDeadEvent, CoinCollectedEvent
+        self.event_bus.unsubscribe(EntityDeadEvent, self._on_entity_dead)
+        self.event_bus.unsubscribe(CoinCollectedEvent, self._on_coin_collected)
 
 
     def _on_wave_complete(self, _: WaveCompleteEvent):
@@ -232,6 +253,29 @@ class World:
     def _on_level_change_request(self, event: LevelChangeRequestEvent):
         self.load_level(event.next_level)
         self.event_bus.dispatch(LevelChangedEvent(event.next_level))
+
+    def _on_coin_collected(self, event):
+        self.coins += event.amount
+
+    def _on_entity_dead(self, event):
+        from entities.enemies.base_enemy import BaseEnemy
+        if isinstance(event.entity, BaseEnemy):
+            import random
+            from pyglet.math import Vec2
+            from entities.combat.pickup_entity import CoinPickupEntity, HeartPickupEntity
+            
+
+            num_coins = random.randint(3, 8)
+            for _ in range(num_coins):
+                vel = Vec2(random.uniform(-4, 4), random.uniform(2, 6))
+                coin = CoinPickupEntity((event.entity.center_x, event.entity.center_y), vel)
+                self.scene.add_sprite("Pickups", coin)
+                
+
+            if random.random() < 0.10:
+                vel = Vec2(random.uniform(-3, 3), random.uniform(3, 7))
+                heart = HeartPickupEntity((event.entity.center_x, event.entity.center_y), vel)
+                self.scene.add_sprite("Pickups", heart)
 
     def _do_level_change(self):
         self._pending_level_change = False

@@ -20,7 +20,7 @@ class HudController(BaseGuiController):
     def set_coins(self,coins:int):
         self.hud.set_text("coins", f"{coins}")
 
-    def set_health(self,health:int):
-        self.hud.set_text("health", f"{health}/100")
+    def set_health(self, health: int, max_health: int = 100):
+        self.hud.set_text("health", f"{health}/{max_health}")
 
 

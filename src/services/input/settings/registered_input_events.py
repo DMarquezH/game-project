@@ -21,6 +21,12 @@ class PlayerAttackInputEvent(BaseEvent):
         super().__init__()
         self.mouse_pos = mouse_pos
 
+class PlayerRangedAttackInputEvent(BaseEvent):
+
+    def __init__(self, mouse_pos: Vec2):
+        super().__init__()
+        self.mouse_pos = mouse_pos
+
 
 class TogglePauseInputEvent(BaseEvent):
     pass

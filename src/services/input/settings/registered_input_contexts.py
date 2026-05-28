@@ -17,6 +17,7 @@ class RegisteredInputContexts:
         RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.PLAYER_MOVE_WASD)
         RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.PLAYER_MOVE_ARROWS)
         RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.PLAYER_ATTACK)
+        RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.PLAYER_RANGED_ATTACK)
         RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.TOGGLE_PAUSE)
 
         RegisteredInputContexts.PAUSE.bind(RegisteredInputBindings.TOGGLE_PAUSE)

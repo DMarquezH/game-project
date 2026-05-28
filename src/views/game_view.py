@@ -86,6 +86,16 @@ class GameView(BaseView):
         if not self.pause_menu.is_enabled() and not self.shop_menu.is_enabled():
             self.world.update(dt)
             self.world_camera.update(dt)
+            
+            # Actualizar HUD
+            if self.world.player:
+                from world.systems.combat.entity_stats import StatDefinition
+                health = self.world.player.stats.get(StatDefinition.HEALTH)
+                max_health = self.world.player.stats.get(StatDefinition.MAX_HEALTH)
+                if health is not None and max_health is not None:
+                    self.hud.set_health(int(health), int(max_health))
+            
+            self.hud.set_coins(self.world.coins)
 
     def on_draw(self):
         super().on_draw()

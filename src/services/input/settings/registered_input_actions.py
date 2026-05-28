@@ -31,6 +31,16 @@ class PlayerAttackInputAction(InputAction):
             )
         )
 
+class PlayerRangedAttackInputAction(InputAction):
+
+    def activate(self, event_bus: EventBus, input_value: AxisInput):
+
+        event_bus.dispatch(
+            PlayerRangedAttackInputEvent(
+                Vec2(input_value.x, input_value.y)
+            )
+        )
+
 
 class TogglePauseInputAction(InputAction):
 

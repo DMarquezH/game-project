@@ -39,6 +39,14 @@ class RegisteredInputBindings:
         InputTrigger.PRESS
     )
 
+    PLAYER_RANGED_ATTACK = SimpleInputBinding(
+        MouseInputDevice.signature_from_button(
+            arcade.MOUSE_BUTTON_RIGHT
+        ),
+        PlayerRangedAttackInputAction(),
+        InputTrigger.PRESS
+    )
+
     ### PAUSE ###
 
     TOGGLE_PAUSE = SimpleInputBinding(
