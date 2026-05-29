@@ -12,6 +12,7 @@ from services.input.settings.registered_input_events import TogglePauseInputEven
 from settings.registered_gameplay_events import ToggleShopEvent, RerollShopEvent
 from world.level.level_events import LevelChangedEvent
 from ui.shop_controller import ShopController
+from world.systems.enemy_wave_system import WaveCompleteEvent
 from world.systems.shop_system import ShopInstance
 from services.input.settings.registered_input_events import ViewportChangedEvent
 from world.world_module import World
@@ -46,6 +47,7 @@ class GameView(BaseView):
         self.event_bus.subscribe(ToggleShopEvent, self.on_toggle_shop)
         self.event_bus.subscribe(RerollShopEvent, self.on_reroll_shop)
         self.event_bus.subscribe(LevelChangedEvent, self._on_level_changed)
+        self.event_bus.subscribe(WaveCompleteEvent, self.hud.update_wave)
 
     def _unsubscribe_listeners(self):
         self.event_bus.unsubscribe(TogglePauseInputEvent, self.on_toggle_pause)
