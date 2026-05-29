@@ -22,7 +22,7 @@ class EntityAttackedMeleeEvent(BaseEvent):
 
 class EntityAttackedRangedEvent(BaseEvent):
 
-    def __init__(self, attacker, attacker_pos: Vec2, attacker_velocity: Vec2, attack_dir: Vec2, damage: float, knockback: float, speed: float):
+    def __init__(self, attacker, attacker_pos: Vec2, attacker_velocity: Vec2, attack_dir: Vec2, damage: float, knockback: float, speed: float, pierce: int = 0, max_distance: float = 1500.0):
         super().__init__()
         self.attacker = attacker
         self.attacker_pos = attacker_pos
@@ -31,6 +31,8 @@ class EntityAttackedRangedEvent(BaseEvent):
         self.damage = damage
         self.knockback = knockback
         self.speed = speed
+        self.pierce = pierce
+        self.max_distance = max_distance
 
 class EntityDeadEvent(BaseEvent):
     def __init__(self, entity):

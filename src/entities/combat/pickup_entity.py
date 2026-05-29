@@ -49,7 +49,7 @@ class CoinPickupEntity(BasePickupEntity):
 
     def apply_effect(self, player: Player, event_bus):
         from settings.registered_gameplay_events import CoinCollectedEvent
-        event_bus.dispatch(CoinCollectedEvent(10))
+        event_bus.dispatch(CoinCollectedEvent(67))
 
 class HeartPickupEntity(BasePickupEntity):
     def __init__(self, position: tuple[float, float], initial_velocity: Vec2):

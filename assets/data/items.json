@@ -1,11 +1,11 @@
 [
   {
     "name": "Armour",
-    "description": "Armadura ligera que aumenta la defensa.",
+    "description": "Armadura ligera que reduce un 20% el daño recibido.",
     "cost": 1500,
-    "value": 8,
+    "value": 0.2,
     "texture": "items/armour_item.png",
-    "stat": "defense"
+    "stat": "armor"
   },
   {
     "name": "Attack Damage",
@@ -17,9 +17,9 @@
   },
   {
     "name": "Attack Range",
-    "description": "Incrementa el alcance de ataque.",
+    "description": "Incrementa el alcance de ataque cuerpo a cuerpo y la distancia de los proyectiles.",
     "cost": 1000,
-    "value": 0.5,
+    "value": 16,
     "texture": "items/attackrange_item.png",
     "stat": "attack_range"
   },
@@ -43,7 +43,7 @@
     "name": "Critical Multiplier",
     "description": "Aumenta el multiplicador de daño crítico.",
     "cost": 2500,
-    "value": 1.25,
+    "value": 0.25,
     "texture": "items/critmul_item.png",
     "stat": "crit_damage_multi"
   },

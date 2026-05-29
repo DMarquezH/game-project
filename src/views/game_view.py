@@ -76,9 +76,14 @@ class GameView(BaseView):
 
     def on_resize(self, width: int, height: int):
         super().on_resize(width, height)
-
         self.world_camera.cam.match_window()
         self.ui_camera.match_window()
+        # Forzar la actualización de las UIs ocultas
+        self.pause_menu.manager.on_resize(width, height)
+        self.shop_menu.manager.on_resize(width, height)
+        
+        # para que los enemigos no spawneen en los bordes de la pantalla antigua
+        self.event_bus.dispatch(ViewportChangedEvent(width, height))
 
     def on_update(self, dt: float):
         super().on_update(dt)

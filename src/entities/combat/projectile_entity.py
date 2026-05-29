@@ -5,12 +5,14 @@ import math
 from entities.combat.hitbox import Hitbox
 
 class ProjectileEntity(Hitbox):
-    def __init__(self, attacker, start_pos: tuple[float, float], attacker_velocity: Vec2, direction: Vec2, speed: float, damage: float, knockback: float):
+    def __init__(self, attacker, start_pos: tuple[float, float], attacker_velocity: Vec2, direction: Vec2, speed: float, damage: float, knockback: float, pierce: int = 0, max_distance: float = 1500.0):
         texture = arcade.load_texture(GameResources.get("textures") / "effects" / "proyectile_16.png")
         super().__init__(attacker, damage, knockback, texture)
         self.position = start_pos
         self.direction = direction.normalize()
         self.speed = speed
+        self.max_pierce = pierce
+        self.pierce_count = 0
         
         # Calculamos cuánto del movimiento del atacante va en la dirección del disparo
         dot_product = (attacker_velocity.x * self.direction.x) + (attacker_velocity.y * self.direction.y)
@@ -29,7 +31,7 @@ class ProjectileEntity(Hitbox):
 
         self.angle = math.degrees(math.atan2(self.velocity_vec.y, self.velocity_vec.x))
         
-        self.max_distance = 1500.0
+        self.max_distance = max_distance
         self.distance_traveled = 0.0
 
     def on_update(self, delta_time: float = 1/60):

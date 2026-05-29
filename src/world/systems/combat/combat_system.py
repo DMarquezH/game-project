@@ -46,7 +46,7 @@ class CombatSystem(BaseSystem):
 
     def on_entity_attacked_ranged(self, event: EntityAttackedRangedEvent):
         if not self.scene: return
-        projectile = ProjectileEntity(event.attacker, event.attacker_pos, event.attacker_velocity, event.attack_dir, event.speed, event.damage, event.knockback)
+        projectile = ProjectileEntity(event.attacker, event.attacker_pos, event.attacker_velocity, event.attack_dir, event.speed, event.damage, event.knockback, event.pierce, event.max_distance)
         self.scene.add_sprite("Projectiles", projectile)
         self.scene.add_sprite("Hitboxes", projectile)
 
@@ -135,12 +135,25 @@ class CombatSystem(BaseSystem):
                             self._apply_damage_and_knockback(owner, hitbox.damage, hitbox.knockback, hitbox.attacker, hitbox)
                             
                             if isinstance(hitbox, ProjectileEntity):
-                                hitbox.kill()
-                                break
+                                if hitbox.pierce_count < hitbox.max_pierce:
+                                    hitbox.pierce_count += 1
+                                else:
+                                    hitbox.kill()
+                                    break
 
     def _apply_damage_and_knockback(self, target, damage, knockback, attacker, attack_entity):
+        # Apply armor (percentage reduction)
+        armor = target.stats.get(StatDefinition.ARMOR) or 0.0
+        # Cap armor at 80% to prevent invincibility
+        armor = min(0.8, armor)
+        damage_after_armor = damage * (1.0 - armor)
+        
+        # Calculate damage reduction based on defense
+        defense = target.stats.get(StatDefinition.DEFENSE) or 0.0
+        actual_damage = max(1.0, damage_after_armor - defense)
+
         # Damage
-        target.stats.decrease(StatDefinition.HEALTH, damage)
+        target.stats.decrease(StatDefinition.HEALTH, actual_damage)
         
         # Reset Iframes
         target.invulnerable_timer = 0.5

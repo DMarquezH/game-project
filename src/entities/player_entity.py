@@ -55,6 +55,12 @@ class Player(BaseEntity):
         self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 128.0)
         self.stats.set(StatDefinition.ATTACK_RANGE, Player.DEFAULT_MELEE_RANGE)
         self.stats.set(StatDefinition.SWING_AMPLITUDE, Player.DEFAULT_MELEE_AMPLITUDE)
+        self.stats.set(StatDefinition.DEFENSE, 0.0)
+        self.stats.set(StatDefinition.ARMOR, 0.0)
+        self.stats.set(StatDefinition.CRIT_CHANCE, 0.0)
+        self.stats.set(StatDefinition.CRIT_DAMAGE_MULTI, 1.5)
+        self.stats.set(StatDefinition.SHOT_PIERCE, 0.0)
+        self.stats.set(StatDefinition.SHOT_SPREAD, 0.0)
 
     def _subscribe_events(self):
         self.event_bus.subscribe(PlayerMoveInputEvent, self._move)
@@ -90,9 +96,16 @@ class Player(BaseEntity):
         p_pos = Vec2(self.position[0], self.position[1])
         attack_direction = (event.mouse_pos - p_pos).normalize()
         damage = self.stats.get(StatDefinition.ATTACK_DAMAGE) or Player.DEFAULT_MELEE_DAMAGE
+        
+        crit_chance = self.stats.get(StatDefinition.CRIT_CHANCE) or 0.0
+        crit_multi = self.stats.get(StatDefinition.CRIT_DAMAGE_MULTI) or 1.5
+        import random
+        if random.random() < crit_chance:
+            damage *= crit_multi
+
         attack_range = self.stats.get(StatDefinition.ATTACK_RANGE) or Player.DEFAULT_MELEE_RANGE
         amplitude = self.stats.get(StatDefinition.SWING_AMPLITUDE) or Player.DEFAULT_MELEE_AMPLITUDE
-        knockback = self.stats.get(StatDefinition.ATTACK_KNOCKBACK) or 128.0
+        knockback = self.stats.get(StatDefinition.ATTACK_KNOCKBACK) or 64.0
 
         self.event_bus.dispatch(EntityAttackedMeleeEvent(
             attacker=self,
@@ -115,8 +128,17 @@ class Player(BaseEntity):
         p_pos = Vec2(self.position[0], self.position[1])
         attack_direction = (event.mouse_pos - p_pos).normalize()
         damage = self.stats.get(StatDefinition.ATTACK_DAMAGE) or Player.DEFAULT_MELEE_DAMAGE
+        
+        crit_chance = self.stats.get(StatDefinition.CRIT_CHANCE) or 0.0
+        crit_multi = self.stats.get(StatDefinition.CRIT_DAMAGE_MULTI) or 1.5
+        import random
+        if random.random() < crit_chance:
+            damage *= crit_multi
+
         shot_speed = self.stats.get(StatDefinition.SHOT_SPEED) or 5.0
-        knockback = self.stats.get(StatDefinition.ATTACK_KNOCKBACK) or 128.0
+        knockback = self.stats.get(StatDefinition.ATTACK_KNOCKBACK) or 64.0
+        pierce = int(self.stats.get(StatDefinition.SHOT_PIERCE) or 0)
+        attack_range = self.stats.get(StatDefinition.ATTACK_RANGE) or Player.DEFAULT_MELEE_RANGE
 
         self.event_bus.dispatch(EntityAttackedRangedEvent(
             attacker=self,
@@ -125,7 +147,9 @@ class Player(BaseEntity):
             attack_dir=attack_direction,
             damage=damage,
             knockback=knockback,
-            speed=shot_speed
+            speed=shot_speed,
+            pierce=pierce,
+            max_distance=attack_range * 6.0
         ))
 
     def dispose(self):

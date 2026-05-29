@@ -41,7 +41,7 @@ class ShopController(BaseGuiController):
             action=lambda:self.event_bus.dispatch(ToggleShopInputEvent()),
             scale=0.8
         )
-        self.reroll_widget = ScoreWidget(GameResources.get("textures") / "ui" / "hud"/ "coin_highres.png",text=f"{self.shop.current_reroll_cost}Reroll")
+        self.reroll_widget = ScoreWidget(GameResources.get("textures") / "ui" / "hud"/ "coin_highres.png",text=f"{self.shop.current_reroll_cost} Reroll")
 
         btn_reroll = BaseButton(
             widget=self.reroll_widget,
@@ -109,7 +109,7 @@ class ShopController(BaseGuiController):
             # Añadimos a la lista activa de items para poder actualizar la tienda luego
             self.active_ui.append(box_layout)
 
-        self.reroll_widget.set_text(f"{self.shop.current_reroll_cost}Reroll")
+        self.reroll_widget.set_text(f"{self.shop.current_reroll_cost} Reroll")
         self.load_items()
 
     def deload_shop(self):

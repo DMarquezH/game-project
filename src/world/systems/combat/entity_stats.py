@@ -41,14 +41,26 @@ class EntityStats:
     def increase(self, stat_def: StatDefinition, increase: float):
 
         stat_value = self.get(stat_def)
-        if not stat_value: return
+        if stat_value is None:
+            stat_value = 0.0
 
-        self.set(stat_def, stat_value + increase)
+        if stat_def in [StatDefinition.ATTACK_SPEED, StatDefinition.MOVEMENT_SPEED]:
+            self.set(stat_def, stat_value * (1.0 + increase))
+        elif stat_def == StatDefinition.ATTACK_KNOCKBACK:
+            self.set(stat_def, stat_value * increase)
+        else:
+            self.set(stat_def, stat_value + increase)
+            
+        if stat_def == StatDefinition.HEALTH:
+            max_health = self.get(StatDefinition.MAX_HEALTH)
+            if max_health is not None and self.get(StatDefinition.HEALTH) > max_health:
+                self.set(StatDefinition.HEALTH, max_health)
 
     def decrease(self, stat_def: StatDefinition, decrease: float):
 
         stat_value = self.get(stat_def)
-        if not stat_value: return
+        if stat_value is None:
+            stat_value = 0.0
 
         self.set(stat_def, stat_value - decrease)
 
