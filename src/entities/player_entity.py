@@ -67,6 +67,9 @@ class Player(BaseEntity):
         self.event_bus.unsubscribe(PlayerRangedAttackInputEvent, self._attack_ranged)
 
     def _move(self, event: PlayerMoveInputEvent):
+        # Stun: no nos movemos voluntariamente si acabamos de recibir un buen golpe
+        if getattr(self, "invulnerable_timer", 0.0) > 0.3:
+            return
 
         move_dir = event.move_dir.normalize()
 
@@ -131,6 +134,9 @@ class Player(BaseEntity):
     def update_animation(self, delta_time: float = 1 / 60, *args, **kwargs) -> None:
         if self._attack_timer > 0:
             self._attack_timer -= delta_time
+            
+        self.update_invulnerability(delta_time)
+        self.hurtbox.sync_position()
 
         moving = abs(self.change_x) >0.1 or abs(self.change_y) >0.1
         if moving:

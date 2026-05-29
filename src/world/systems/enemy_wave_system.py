@@ -51,6 +51,7 @@ class EnemyWaveSystem(BaseSystem):
         scene: arcade.Scene,
         movement_system: MovementSystem,
         barrier_list=None,
+        walls=None,
     ):
         super().init()
         self._waves = waves
@@ -58,6 +59,8 @@ class EnemyWaveSystem(BaseSystem):
         self._scene = scene
         self._movement_system = movement_system
         self._barrier_list = barrier_list
+        self._walls = walls
+        self.enemy_physics = []
         self._viewport_w = 960.0   # valor por defecto hasta recibir el evento
         self._viewport_h = 540.0
         self.event_bus.subscribe(ViewportChangedEvent, self._on_viewport_changed)
@@ -94,6 +97,10 @@ class EnemyWaveSystem(BaseSystem):
     def on_update(self, delta_time: float):
         self._try_spawn(delta_time)
         self._check_wave_complete()
+        
+        # Actualizamos las físicas (colisiones con paredes)
+        for physics in self.enemy_physics:
+            physics.update()
 
     def _try_spawn(self, delta_time: float):
         if not self._spawn_queue:
@@ -120,8 +127,12 @@ class EnemyWaveSystem(BaseSystem):
         enemy.position = position
 
         self._scene.add_sprite("Enemies", enemy)
+        self._scene.add_sprite("Hurtboxes", enemy.hurtbox)
         self._movement_system.add_entity(enemy, MovementMode.FLOOR)
         self._active_enemies.add(enemy)
+        
+        if self._walls:
+            self.enemy_physics.append(arcade.PhysicsEngineSimple(enemy, self._walls))
 
     def _get_spawn_position(self) -> tuple[float, float]:
         cx, cy = self._player.position
@@ -143,6 +154,7 @@ class EnemyWaveSystem(BaseSystem):
         if isinstance(entity, BaseEnemy):
             self._active_enemies.discard(entity)
             self._movement_system.remove_entity(entity)
+            self.enemy_physics = [p for p in self.enemy_physics if p.player_sprite != entity]
             entity.kill()
             self._check_wave_complete()
         elif isinstance(entity, Player):

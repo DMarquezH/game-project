@@ -2,17 +2,15 @@ import arcade
 from pyglet.math import Vec2
 from settings.game_resources import GameResources
 import math
+from entities.combat.hitbox import Hitbox
 
-class ProjectileEntity(arcade.Sprite):
+class ProjectileEntity(Hitbox):
     def __init__(self, attacker, start_pos: tuple[float, float], attacker_velocity: Vec2, direction: Vec2, speed: float, damage: float, knockback: float):
         texture = arcade.load_texture(GameResources.get("textures") / "effects" / "proyectile_16.png")
-        super().__init__(texture)
-        self.attacker = attacker
+        super().__init__(attacker, damage, knockback, texture)
         self.position = start_pos
         self.direction = direction.normalize()
         self.speed = speed
-        self.damage = damage
-        self.knockback = knockback
         
         # Calculamos cuánto del movimiento del atacante va en la dirección del disparo
         dot_product = (attacker_velocity.x * self.direction.x) + (attacker_velocity.y * self.direction.y)

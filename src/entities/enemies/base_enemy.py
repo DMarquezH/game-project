@@ -41,6 +41,10 @@ class BaseEnemy(BaseEntity, ABC):
         ) or []
 
     def _follow_path(self) -> None:
+        # Stunned? No se mueven
+        if getattr(self, "invulnerable_timer", 0.0) > 0.3:
+            return
+            
         if not self._path:
             self._move_direct()
             return
@@ -67,9 +71,13 @@ class BaseEnemy(BaseEntity, ABC):
             self.event_bus.dispatch(EntityMoveEvent(self, direction.normalize()))
 
     def _stop(self) -> None:
+        if getattr(self, "invulnerable_timer", 0.0) > 0.3:
+            return
         self.event_bus.dispatch(EntityMoveEvent(self, Vec2(0, 0)))
         
     def on_update(self, delta_time: float) -> None:
+        self.update_invulnerability(delta_time)
+        self.hurtbox.sync_position()
         self._path_timer += delta_time
         if self._path_timer >= self.PATH_RECALCULATE_INTERVAL:
             self._path_timer = 0.0

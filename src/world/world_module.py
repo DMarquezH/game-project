@@ -148,6 +148,8 @@ class World:
         self.scene.add_sprite_list_after("Enemies", "Floor")
         
         ### COMBATE ###
+        self.scene.add_sprite_list("Hurtboxes")
+        self.scene.add_sprite_list("Hitboxes")
         self.scene.add_sprite_list("Projectiles")
         self.scene.add_sprite_list("MeleeSwipes")
         self.scene.add_sprite_list("Pickups")
@@ -160,6 +162,7 @@ class World:
         self.player.position = data.player_start
 
         self.scene.add_sprite("player", self.player)
+        self.scene.add_sprite("Hurtboxes", self.player.hurtbox)
 
         movement_system: MovementSystem = self.systems.get(MovementSystem)
         movement_system.add_entity(self.player, MovementMode.FLOOR)
@@ -177,12 +180,14 @@ class World:
         waves = self._generate_waves()
 
         wave_system: EnemyWaveSystem = self.systems.get(EnemyWaveSystem)
+        walls = [self.scene[name] for name in data.collision_layers]
         wave_system.setup(
             waves = waves,
             player = self.player,
             scene = self.scene,
             movement_system = self.systems.get(MovementSystem),
             barrier_list = self.barrier_list,
+            walls = walls
         )
 
     def _generate_waves(self):
@@ -310,7 +315,7 @@ class World:
             return  
 
         self.physics.update()
-        self.scene["Enemies"].update()
+        # Las físicas de los enemigos ahora se encargan de su movimiento posicional
         self.player.update_animation()
 
         for system in self.systems.values():
