@@ -19,8 +19,8 @@ class LevelLoader:
                 blocking_sprites.extend(self.tile_map.sprite_lists[name])
 
             # no se puede hacer un A* para cada enemigo asi q hay q hacer todos loas enemigos de mas o menos el mismo tamaño
-            enemy = arcade.Sprite() # esto lo que hace es pillar uno de ejemplo para el pathfinding de todos
-            enemy.texture = arcade.load_texture(GameResources.get("textures") / "entity" / "enemy_32.png")
+             # cambie el sprite de slime por un cuaadrado por q no furulaba con el zombie ese nuevo
+            enemy = arcade.SpriteSolidColor(64, 96, arcade.color.WHITE)
 
             return arcade.AStarBarrierList(
                 moving_sprite = enemy,
