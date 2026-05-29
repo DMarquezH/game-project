@@ -11,6 +11,7 @@ from core.service_container import ServiceContainer
 
 from services.input.input_service import InputService
 from services.navigation_service import NavigationService
+from services.audio_service import AudioService
 from settings.game_constants import GameConstants
 from settings.game_resources import GameResources
 from services.input.settings.registered_input_contexts import RegisteredInputContexts
@@ -56,10 +57,12 @@ def init_services(service_container: ServiceContainer, window: MainWindow, view_
     nav_service = NavigationService(window, service_container, view_registry)
     event_bus = EventBus()
     input_service = InputService(event_bus)
+    audio_service = AudioService(event_bus)
 
     service_container.register(nav_service)
     service_container.register(event_bus)
     service_container.register(input_service)
+    service_container.register(audio_service)
 
     service_container.freeze()
 

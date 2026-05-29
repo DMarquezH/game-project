@@ -33,7 +33,7 @@ class ShopController(BaseGuiController):
         fila_botones = arcade.gui.UIBoxLayout(vertical=False, space_between=20)
         btn_nxt = BaseButton(
             sheet=GameResources.get("textures") / "ui" / "menus" / "button_siguiente_spritesheet.png",
-            sound=GameResources.get("sounds") / "ui" / "button_click.wav",
+            event_bus=self.event_bus,
             image_width=300,
             image_height=138,
             columns=2,
@@ -51,7 +51,7 @@ class ShopController(BaseGuiController):
             image_height= 138,
             columns=2,
             count=2,
-            sound = GameResources.get("sounds") / "ui" / "button_click.wav",
+            event_bus=self.event_bus,
             scale = 0.8
         )
 
@@ -101,7 +101,6 @@ class ShopController(BaseGuiController):
                 image_height=138,
                 columns=2,
                 count=2,
-                sound = GameResources.get("sounds") / "ui" / "button_click.wav",
                 scale= 0.8
             )
             box_layout.add(buy_button)

@@ -20,7 +20,6 @@ class PauseController(BaseGuiController):
         button_list = [
             {
                 "sheet": menu_textures / "button_reanudar_spritesheet.png",
-                "sound": sounds / "menu_button.wav",
                 "action": lambda : self.event_bus.dispatch(TogglePauseInputEvent()),
                 "width": 300,
                 "height": 138,
@@ -29,7 +28,6 @@ class PauseController(BaseGuiController):
             },
             {
                 "sheet": menu_textures / "button_opciones_spritesheet.png",
-                "sound": sounds / "menu_button.wav",
                 "action": None,
                 "width": 300,
                 "height": 138,
@@ -38,7 +36,6 @@ class PauseController(BaseGuiController):
             },
             {
                 "sheet": menu_textures / "button_menu_principal_spritesheet.png",
-                "sound": sounds / "menu_button.wav",
                 "action": lambda: self.current_view.nav_service.navigate(RegisteredViews.MAIN_MENU),
                 "width": 300,
                 "height": 138,
@@ -47,7 +44,7 @@ class PauseController(BaseGuiController):
             }
 
         ]
-        self.botones = GridButtons(button_list,space_between=50,background=menu_textures / "pause_background.png")
+        self.botones = GridButtons(button_list,space_between=50,background=menu_textures / "pause_background.png", event_bus=self.event_bus)
         self.manager.add(self.botones)
 
     def enable(self):

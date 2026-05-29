@@ -9,7 +9,7 @@ from services.input.input_service import InputService
 from services.navigation_service import NavigationService
 from services.input.settings.registered_input_contexts import RegisteredInputContexts
 from services.input.settings.registered_input_events import TogglePauseInputEvent, ToggleShopInputEvent
-from settings.registered_gameplay_events import ToggleShopEvent, RerollShopEvent
+from settings.registered_gameplay_events import ToggleShopEvent, RerollShopEvent, PlayMusicEvent, PopupOpenedEvent
 from world.level.level_events import LevelChangedEvent
 from ui.shop_controller import ShopController
 from world.systems.enemy_wave_system import WaveCompleteEvent
@@ -63,6 +63,7 @@ class GameView(BaseView):
         self.background_color = arcade.color.BLACK
         self.hud.enable()
         self.event_bus.dispatch(ViewportChangedEvent(self.window.width, self.window.height))
+        self.event_bus.dispatch(PlayMusicEvent("soundtrack3-edit"))
 
     def on_hide_view(self):
 
@@ -134,6 +135,7 @@ class GameView(BaseView):
         self.input_service.disable_context(RegisteredInputContexts.DEBUG)
 
         self.pause_menu.enable()
+        self.event_bus.dispatch(PopupOpenedEvent())
 
     def unpause(self):
 
@@ -176,6 +178,7 @@ class GameView(BaseView):
 
         self.shop_menu.load_shop(shop)
         self.shop_menu.enable()
+        self.event_bus.dispatch(PopupOpenedEvent())
 
     def deactivate_shop(self):
 

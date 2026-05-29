@@ -4,6 +4,8 @@ from arcade.gui import UIManager
 from core.display import BaseView
 from services.input.input_service import InputService
 from services.navigation_service import NavigationService
+from services.event_service import EventBus
+from settings.registered_gameplay_events import GameStartedEvent
 from settings.game_resources import GameResources
 from settings.registered_views import RegisteredViews
 from ui.grid_button_builder import GridButtons
@@ -14,9 +16,11 @@ class MainMenuView(BaseView):
     Main menus containing background and main buttons
     """
 
-    def __init__(self, input_service: InputService, nav_service: NavigationService):
+    def __init__(self, input_service: InputService, nav_service: NavigationService, event_bus: EventBus):
         super().__init__(input_service)
 
+        self.event_bus = event_bus
+        self.nav_service = nav_service
         self.ui = UIManager()
 
         menu_textures = GameResources.get("textures") / "ui" / "menus"
@@ -25,8 +29,7 @@ class MainMenuView(BaseView):
         self.button_data = [
             {
                 "sheet": menu_textures / "button_jugar_spritesheet.png",
-                "sound": sounds / "menu_button.wav",
-                "action": lambda: nav_service.navigate(RegisteredViews.GAME),
+                "action": self._start_game,
                 "width": 300,
                 "height": 138,
                 "columns": 2,
@@ -34,7 +37,6 @@ class MainMenuView(BaseView):
             },
             {
                 "sheet": menu_textures / "button_opciones_spritesheet.png",
-                "sound": sounds / "menu_button.wav",
                 "action": None,
                 "width": 300,
                 "height": 138,
@@ -43,7 +45,6 @@ class MainMenuView(BaseView):
             },
             {
                 "sheet": menu_textures / "button_salir_spritesheet.png",
-                "sound": sounds / "menu_button.wav",
                 "action": lambda: arcade.close_window(),
                 "width": 300,
                 "height": 138,
@@ -52,10 +53,14 @@ class MainMenuView(BaseView):
             }
         ]
 
-        self.botones = GridButtons(self.button_data, space_between=50)
+        self.botones = GridButtons(self.button_data, space_between=50, event_bus=self.event_bus)
         self.imagen: arcade.Texture = arcade.load_texture(menu_textures / "main_menu_background.png")
 
         self.ui.add(self.botones)
+
+    def _start_game(self):
+        self.event_bus.dispatch(GameStartedEvent())
+        self.nav_service.navigate(RegisteredViews.GAME)
 
     def draw_imagen(self):
         arcade.draw_texture_rect(

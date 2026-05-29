@@ -11,7 +11,7 @@ from entities.player_entity import Player
 from settings.game_resources import GameResources
 from services.input.settings.registered_input_events import ToggleDebugInputEvent, ToggleShopInputEvent
 from settings.registered_gameplay_events import RerollShopEvent, ToggleShopEvent, BuyItemEvent
-from temp.example import Enemy
+
 from world.level.registered_levels import RegisteredLevels
 from world.systems import shop_system
 from world.systems.combat.combat_system import CombatSystem
@@ -188,7 +188,8 @@ class World:
             scene = self.scene,
             movement_system = self.systems.get(MovementSystem),
             barrier_list = self.barrier_list,
-            walls = walls
+            walls = walls,
+            bounds = self.current_level.bounds
         )
 
     def _generate_waves(self):
@@ -386,6 +387,8 @@ class World:
         if price <= self.coins:
             self.coins -= price
             self.player.stats.increase(EntityStats.resolve(event.item.stat), event.item.value)
+            from settings.registered_gameplay_events import ItemBoughtSuccessEvent
+            self.event_bus.dispatch(ItemBoughtSuccessEvent(event.item))
             self.event_bus.dispatch(ToggleShopEvent(event.shop))
 
         # El evento tendra: El item dodne sacamos la stat y el valor

@@ -3,8 +3,8 @@ from arcade import Texture, SpriteSheet
 
 from entities.base_entity import BaseEntity
 from services.event_service import EventBus
-from settings.registered_gameplay_events import EntityAttackedMeleeEvent, EntityAttackedRangedEvent
 from services.input.settings.registered_input_events import PlayerAttackInputEvent, PlayerMoveInputEvent, PlayerRangedAttackInputEvent
+from settings.registered_gameplay_events import EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityFootstepEvent
 from world.systems.combat.entity_stats import StatDefinition
 from world.systems.movement.movement_events import EntityMoveEvent
 from pyglet.math import Vec2
@@ -179,7 +179,13 @@ class Player(BaseEntity):
 
             while self.anim_time >= self.anim_fps:
                 self.anim_time -= self.anim_fps
+                
+                old_frame = self.moving_frame
                 self.moving_frame = (self.moving_frame + 1) % len(current_frames)
+                
+                # Dispatch footstep event on specific frames (e.g. 0 and 2 for a 4-frame walk cycle)
+                if self.moving_frame != old_frame and self.moving_frame in [0, 2]:
+                    self.event_bus.dispatch(EntityFootstepEvent(self))
 
             self.texture = self.textures[current_frames[self.moving_frame]]
 

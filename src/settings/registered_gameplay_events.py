@@ -39,6 +39,34 @@ class EntityDeadEvent(BaseEvent):
         super().__init__()
         self.entity = entity
 
+class EntityDamagedEvent(BaseEvent):
+    def __init__(self, entity, damage: float):
+        super().__init__()
+        self.entity = entity
+        self.damage = damage
+
+class EntityFootstepEvent(BaseEvent):
+    def __init__(self, entity):
+        super().__init__()
+        self.entity = entity
+
+class PlayMusicEvent(BaseEvent):
+    def __init__(self, track_name: str):
+        super().__init__()
+        self.track_name = track_name
+
+class UIButtonClickEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()
+
+class PopupOpenedEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()
+
+class GameStartedEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()
+
 
 class ToggleShopEvent(BaseEvent):
 
@@ -54,10 +82,14 @@ class RerollShopEvent(BaseEvent):
         self.shop = shop
 
 class BuyItemEvent(BaseEvent):
-
-    def __init__(self, item: ItemEntity, shop:ShopInstance):
+    def __init__(self,item:ItemEntity,shop:ShopInstance):
         super().__init__()
+        self.item = item
         self.shop = shop
+
+class ItemBoughtSuccessEvent(BaseEvent):
+    def __init__(self, item: ItemEntity):
+        super().__init__()
         self.item = item
 
 class CoinCollectedEvent(BaseEvent):

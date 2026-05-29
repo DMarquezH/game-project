@@ -3,6 +3,7 @@ import arcade.gui
 
 from ui.widgets.base_button import BaseButton
 from pathlib import Path
+from services.event_service import EventBus
 
 class GridButtons(arcade.gui.UIAnchorLayout):
     """
@@ -22,13 +23,13 @@ class GridButtons(arcade.gui.UIAnchorLayout):
 
 
     """
-    def __init__(self, button_list:list[dict],background:Path=None, space_between:int=0, position_x="center", position_y="center"):
+    def __init__(self, button_list:list[dict], background:Path=None, space_between:int=0, position_x="center", position_y="center", event_bus: EventBus = None):
         super().__init__()
         box_layout = arcade.gui.UIBoxLayout(space_between=space_between)
         for button in button_list:
             boton = BaseButton(
                 sheet=button["sheet"],
-                sound=button["sound"],
+                event_bus=event_bus,
                 action=button["action"],
                 image_width=button.get("width",0),
                 image_height=button.get("height",0),

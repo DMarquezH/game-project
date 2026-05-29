@@ -5,7 +5,7 @@ from pyglet.math import Vec2
 from entities.player_entity import Player
 from entities.enemies.base_enemy import BaseEnemy
 from services.event_service import EventBus
-from settings.registered_gameplay_events import EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityDeadEvent
+from settings.registered_gameplay_events import EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityDeadEvent, EntityDamagedEvent
 from world.systems.base_system import BaseSystem
 from entities.combat.projectile_entity import ProjectileEntity
 from entities.combat.melee_swipe_entity import MeleeSwipeEntity
@@ -154,6 +154,7 @@ class CombatSystem(BaseSystem):
 
         # Damage
         target.stats.decrease(StatDefinition.HEALTH, actual_damage)
+        self.event_bus.dispatch(EntityDamagedEvent(target, actual_damage))
         
         # Reset Iframes
         target.invulnerable_timer = 0.5

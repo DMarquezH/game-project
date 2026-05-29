@@ -52,6 +52,7 @@ class EnemyWaveSystem(BaseSystem):
         movement_system: MovementSystem,
         barrier_list=None,
         walls=None,
+        bounds: arcade.Rect = None,
     ):
         super().init()
         self._waves = waves
@@ -60,6 +61,7 @@ class EnemyWaveSystem(BaseSystem):
         self._movement_system = movement_system
         self._barrier_list = barrier_list
         self._walls = walls
+        self._bounds = bounds
         self.enemy_physics = []
         self._viewport_w = 960.0   # valor por defecto hasta recibir el evento
         self._viewport_h = 540.0
@@ -139,15 +141,41 @@ class EnemyWaveSystem(BaseSystem):
         half_w = self._viewport_w / 2 + self.SPAWN_MARGIN
         half_h = self._viewport_h / 2 + self.SPAWN_MARGIN
 
-        side = random.randint(0, 3)
+        margin = 200
+        bounds = getattr(self, '_bounds', None)
+
+        valid_sides = []
+        
+        # 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
+        if not bounds or (cy + half_h <= bounds.top - margin):
+            valid_sides.append(0)
+        if not bounds or (cy - half_h >= bounds.bottom + margin):
+            valid_sides.append(1)
+        if not bounds or (cx - half_w >= bounds.left + margin):
+            valid_sides.append(2)
+        if not bounds or (cx + half_w <= bounds.right - margin):
+            valid_sides.append(3)
+
+        # Si el mapa es tan pequeño que ningún lado vale, elegimos cualquiera
+        if not valid_sides:
+            valid_sides = [0, 1, 2, 3]
+
+        side = random.choice(valid_sides)
+
         if side == 0:
-            return (random.uniform(cx - half_w, cx + half_w), cy + half_h)
+            x, y = random.uniform(cx - half_w, cx + half_w), cy + half_h
         elif side == 1:
-            return (random.uniform(cx - half_w, cx + half_w), cy - half_h)
+            x, y = random.uniform(cx - half_w, cx + half_w), cy - half_h
         elif side == 2:
-            return (cx - half_w, random.uniform(cy - half_h, cy + half_h))
+            x, y = cx - half_w, random.uniform(cy - half_h, cy + half_h)
         else:
-            return (cx + half_w, random.uniform(cy - half_h, cy + half_h))
+            x, y = cx + half_w, random.uniform(cy - half_h, cy + half_h)
+            
+        if bounds:
+            x = max(bounds.left + margin, min(x, bounds.right - margin))
+            y = max(bounds.bottom + margin, min(y, bounds.top - margin))
+            
+        return x, y
 
     def _on_entity_dead(self, event) -> None:
         entity = event.entity
