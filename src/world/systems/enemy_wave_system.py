@@ -166,3 +166,6 @@ class EnemyWaveSystem(BaseSystem):
         self.event_bus.unsubscribe(ViewportChangedEvent, self._on_viewport_changed)
         from settings.registered_gameplay_events import EntityDeadEvent
         self.event_bus.unsubscribe(EntityDeadEvent, self._on_entity_dead)
+
+    def get_active_enemies(self):
+        return self._active_enemies

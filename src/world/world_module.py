@@ -11,6 +11,7 @@ from entities.player_entity import Player
 from settings.game_resources import GameResources
 from services.input.settings.registered_input_events import ToggleDebugInputEvent, ToggleShopInputEvent
 from settings.registered_gameplay_events import RerollShopEvent, ToggleShopEvent, BuyItemEvent
+from temp.example import Enemy
 from world.level.registered_levels import RegisteredLevels
 from world.systems import shop_system
 from world.systems.combat.combat_system import CombatSystem
@@ -317,6 +318,10 @@ class World:
         self.physics.update()
         # Las físicas de los enemigos ahora se encargan de su movimiento posicional
         self.player.update_animation()
+
+        wave = self.systems.get(EnemyWaveSystem)
+        for enemy in wave.get_active_enemies():
+            enemy.update_animation(delta_time)
 
         for system in self.systems.values():
             system.update()
