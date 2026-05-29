@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import arcade
+from pyglet.image import Texture
 from pyglet.math import Vec2
 
 from entities.base_entity import BaseEntity
@@ -20,6 +21,14 @@ class BaseEnemy(BaseEntity, ABC):
         self._setup_texture()
         self._setup_stats()
 
+        #Animation
+        self.anim_time = 0
+        self.anim_fps = 1/8
+        self.frame_index = 0
+        self.scale = 0.35
+
+        self._setup_animation()
+
     # las estadisticas
     @abstractmethod
     def _setup_stats(self) -> None: ...
@@ -29,6 +38,13 @@ class BaseEnemy(BaseEntity, ABC):
     
     @abstractmethod
     def _setup_texture(self) -> None: ...
+
+    @abstractmethod
+    def _setup_animation(self): ...
+
+    @abstractmethod
+    def update_animation(self, delta_time: float) -> None: ...
+
 
     # El movimiento es para todos x igual ya q el A* dice chatgpt q consume mucha memoria
     # y q no se puede hacer para cada enemigo
