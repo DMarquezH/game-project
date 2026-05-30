@@ -30,7 +30,7 @@ class GameView(BaseView):
 
         self.active_keyboard_inputs = set()
         self.world = World(event_bus)
-        self.hud = HudController()
+        self.hud = HudController(self.world.player.stats)
         self.pause_menu = PauseController(self, event_bus)
         self.shop_menu = ShopController(event_bus)
 
@@ -54,6 +54,7 @@ class GameView(BaseView):
         self.event_bus.unsubscribe(ToggleShopEvent, self.on_toggle_shop)
         self.event_bus.unsubscribe(RerollShopEvent, self.on_reroll_shop)
         self.event_bus.unsubscribe(LevelChangedEvent, self._on_level_changed)
+        self.event_bus.unsubscribe(WaveCompleteEvent, self.hud.update_wave)
 
     def on_show_view(self):
 
@@ -104,6 +105,7 @@ class GameView(BaseView):
                     self.hud.set_health(int(health), int(max_health))
             
             self.hud.set_coins(self.world.coins)
+            self.hud.update_stats(self.world.player)
 
     def on_draw(self):
         super().on_draw()
