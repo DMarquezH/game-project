@@ -2,7 +2,7 @@ import arcade
 import random
 from services.event_service import EventBus
 from settings.game_resources import GameResources
-from settings.registered_gameplay_events import EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityDamagedEvent, EntityFootstepEvent, UIButtonClickEvent, PopupOpenedEvent, GameStartedEvent, ItemBoughtSuccessEvent, PlayMusicEvent
+from settings.registered_gameplay_events import CoinCollectedEvent, EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityDamagedEvent, EntityFootstepEvent, UIButtonClickEvent, PopupOpenedEvent, GameStartedEvent, ItemBoughtSuccessEvent, PlayMusicEvent
 from entities.player_entity import Player
 
 class AudioService:
@@ -34,6 +34,7 @@ class AudioService:
         self.event_bus.subscribe(EntityAttackedRangedEvent, self._on_ranged_attack)
         self.event_bus.subscribe(EntityDamagedEvent, self._on_entity_damaged)
         self.event_bus.subscribe(EntityFootstepEvent, self._on_footstep)
+        self.event_bus.subscribe(CoinCollectedEvent, self._on_coin_collected)
         
         # New UI and System events
         self.event_bus.subscribe(UIButtonClickEvent, self._on_ui_click)
@@ -58,6 +59,9 @@ class AudioService:
         if isinstance(event.entity, Player):
             pitch = random.uniform(0.9, 1.1)
             self.play_random_sound("foot_steps", volume=0.3, speed=pitch)
+
+    def _on_coin_collected(self, event: CoinCollectedEvent):
+        self.play_sound("coin", volume=0.7)
 
     def _on_ui_click(self, event: UIButtonClickEvent):
         self.play_sound("ui_button", volume=0.8)

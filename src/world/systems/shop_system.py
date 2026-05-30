@@ -8,7 +8,7 @@ from services.event_service import EventBus
 class ShopInstance:
 
     INIT_REROLL_COST = 0
-    REROLL_COST_INCREMENT = 1
+    REROLL_COST_INCREMENT = 25
 
     def __init__(self, event_bus: EventBus, items: List[ItemEntity]):
         self.event_bus = event_bus

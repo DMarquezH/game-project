@@ -10,7 +10,7 @@
   {
     "name": "Attack Damage",
     "description": "Aumenta el daño de los ataques.",
-    "cost": 0,
+    "cost": 1200,
     "value": 10,
     "texture": "items/attackdamage.png",
     "stat": "attack_damage"

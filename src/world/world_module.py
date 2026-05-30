@@ -24,7 +24,7 @@ from world.level.level_events import LevelChangeRequestEvent, LevelChangedEvent
 
 import json
 import random
-
+from settings.registered_gameplay_events import EntityDeadEvent, CoinCollectedEvent
 from world.systems.shop_system import ShopInstance
 from world.systems.enemy_wave_system import EnemyWaveSystem, WaveCompleteEvent, AllWavesCompleteEvent
 from entities.enemies.melee_enemy import MeleeEnemy
@@ -229,7 +229,6 @@ class World:
         self.event_bus.subscribe(WaveCompleteEvent, self._on_wave_complete)
         self.event_bus.subscribe(AllWavesCompleteEvent, self._on_all_waves_complete)
         self.event_bus.subscribe(LevelChangeRequestEvent, self._on_level_change_request)
-        from settings.registered_gameplay_events import EntityDeadEvent, CoinCollectedEvent
         self.event_bus.subscribe(EntityDeadEvent, self._on_entity_dead)
         self.event_bus.subscribe(CoinCollectedEvent, self._on_coin_collected)
 
@@ -241,18 +240,14 @@ class World:
         self.event_bus.unsubscribe(WaveCompleteEvent, self._on_wave_complete)
         self.event_bus.unsubscribe(AllWavesCompleteEvent, self._on_all_waves_complete)
         self.event_bus.unsubscribe(LevelChangeRequestEvent, self._on_level_change_request)
-        from settings.registered_gameplay_events import EntityDeadEvent, CoinCollectedEvent
         self.event_bus.unsubscribe(EntityDeadEvent, self._on_entity_dead)
         self.event_bus.unsubscribe(CoinCollectedEvent, self._on_coin_collected)
 
 
     def _on_wave_complete(self, _: WaveCompleteEvent):
         self._completed_waves += 1
-
-        # Cada 5 rondas tienda
-        if self._completed_waves % 5 == 0:
-            self._shop_delay_active = True
-            self._shop_delay_timer = self.SHOP_DELAY_SECONDS
+        self._shop_delay_active = True
+        self._shop_delay_timer = self.SHOP_DELAY_SECONDS
 
     def _on_all_waves_complete(self, _: AllWavesCompleteEvent):
         self._pending_level_change = True
@@ -371,9 +366,12 @@ class World:
         return random.sample(candidatos,final_count)
 
     def on_shop_reroll(self, event: RerollShopEvent):
+
         shop = event.shop
-        shop.reroll()
-        shop.load_new_items(self.randomize_items(shop.used_items))
+        if shop.current_reroll_cost <= self.coins:
+            self.coins -= shop.current_reroll_cost
+            shop.reroll()
+            shop.load_new_items(self.randomize_items(shop.used_items))
 
     def open_shop(self, _: ToggleShopInputEvent):
 
