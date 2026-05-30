@@ -1,40 +1,52 @@
 import arcade
 import random
-
+import math
 from pyglet.math import Vec2
+from entities.combat.hurtbox import Hurtbox
 from services.event_service import EventBus
 from entities.player_entity import Player
 from entities.enemies.base_enemy import BaseEnemy
 from settings.game_resources import GameResources
 from world.systems.combat.entity_stats import StatDefinition
 from settings.registered_gameplay_events import EntityAttackedMeleeEvent
+from world.systems.movement.movement_events import EntityMoveEvent
 
 
-class MeleeEnemy(BaseEnemy):
+class BossEnemy(BaseEnemy):
 
-    ATTACK_DISTANCE = 50.0 
+    ATTACK_DISTANCE = 140.0 
 
     def __init__(self, event_bus: EventBus, player: Player, barrier_list=None):
         super().__init__(event_bus, player, barrier_list)
         self._attack_timer = 0.0
+        self._hover_time = 0.0
+        
+        self.scale = 1.0
+        
+        if hasattr(self, "hurtbox") and self.hurtbox:
+            self.hurtbox.kill()
+        self.hurtbox = Hurtbox(self, width=96, height=192)
 
     def _setup_stats(self) -> None:
-        # Randomizamos levemente las estadisticas base
-        health = random.uniform(40.0, 60.0)
-        damage = random.uniform(8.0, 15.0)
-        speed = random.uniform(1.8, 2.3)
+        health = 1200.0
+        damage = 25.0
+        speed = 1.2
         
         self.stats.set(StatDefinition.MOVEMENT_SPEED, speed)
         self.stats.set(StatDefinition.MAX_HEALTH, health)
         self.stats.set(StatDefinition.HEALTH, health)
         self.stats.set(StatDefinition.ATTACK_DAMAGE, damage)
-        self.stats.set(StatDefinition.ATTACK_SPEED, 1.0) # 1 ataque por segundo
-        self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64.0)
+        self.stats.set(StatDefinition.ATTACK_SPEED, 0.5) 
+        self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64*3)
 
     def _setup_texture(self) -> None:
         sheet = arcade.load_spritesheet(GameResources.get("textures")/ "entity" / "enemy_spritesheet.png")
         self.textures = sheet.get_texture_grid((209,270),6,16)
         self.texture = self.textures[0]
+        self.scale = 1.0
+
+        self.color = arcade.color.GHOST_WHITE   # tinte para que se vea distinto de mientras
+        self.alpha = 200 # Ligeramente transparente por ser un fantasma
 
     def _setup_animation(self) -> None:
         self.walk_down = [0,1,2,3]
@@ -62,21 +74,41 @@ class MeleeEnemy(BaseEnemy):
                 self.anim_time -= self.anim_fps
                 self.frame_index = (self.frame_index + 1) % len(current_frames)
 
-
             self.texture = self.textures[current_frames[self.frame_index]]
-
         else:
             self.anim_time = 0
             self.frame_index = 0
             self.texture = self.textures[self.frame_index]
 
+    def _follow_path(self) -> None:
+        # Ignora los muros y el A* pathfinding.
+        
+        if getattr(self, "invulnerable_timer", 0.0) > 0.3:
+            return
+            
+        dx = self._player.center_x - self.center_x
+        dy = self._player.center_y - self.center_y
+        direction = Vec2(dx, dy)
+        
+        if direction.length() > 0:
+            direction = direction.normalize()
+            # Añadimos el efecto "hover" en el eje Y
+            hover_amplitude = 0.5 
+            hover_offset = math.sin(self._hover_time * 4.0) * hover_amplitude
+            
+            direction = Vec2(direction.x, direction.y + hover_offset)
+            
+            self.event_bus.dispatch(EntityMoveEvent(self, direction))
+
     def update_behavior(self, delta_time: float) -> None:
+        self._hover_time += delta_time
+        
         if self._get_distance_to_player() <= self.ATTACK_DISTANCE:
             self._stop()
             self._try_attack(delta_time)
         else:
-            pass # BaseEnemy ya maneja el movimiento y por eso se bugueaban en las piedras
-
+            # BaseEnemy ya llama a _follow_path(),
+            pass
 
     def _try_attack(self, delta_time: float) -> None:
         self._attack_timer += delta_time
@@ -98,7 +130,7 @@ class MeleeEnemy(BaseEnemy):
             attacker_pos=self.position,
             attack_dir=direction,
             attack_range=self.ATTACK_DISTANCE,
-            amplitude=90.0,
+            amplitude=240.0,
             damage=damage,
             knockback=knockback
         ))

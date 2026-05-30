@@ -96,12 +96,6 @@ class Player(BaseEntity):
         p_pos = Vec2(self.position[0], self.position[1])
         attack_direction = (event.mouse_pos - p_pos).normalize()
         damage = self.stats.get(StatDefinition.ATTACK_DAMAGE) or Player.DEFAULT_MELEE_DAMAGE
-        
-        crit_chance = self.stats.get(StatDefinition.CRIT_CHANCE) or 0.0
-        crit_multi = self.stats.get(StatDefinition.CRIT_DAMAGE_MULTI) or 1.5
-        import random
-        if random.random() < crit_chance:
-            damage *= crit_multi
 
         attack_range = self.stats.get(StatDefinition.ATTACK_RANGE) or Player.DEFAULT_MELEE_RANGE
         amplitude = self.stats.get(StatDefinition.SWING_AMPLITUDE) or Player.DEFAULT_MELEE_AMPLITUDE
@@ -128,12 +122,6 @@ class Player(BaseEntity):
         p_pos = Vec2(self.position[0], self.position[1])
         attack_direction = (event.mouse_pos - p_pos).normalize()
         damage = self.stats.get(StatDefinition.ATTACK_DAMAGE) or Player.DEFAULT_MELEE_DAMAGE
-        
-        crit_chance = self.stats.get(StatDefinition.CRIT_CHANCE) or 0.0
-        crit_multi = self.stats.get(StatDefinition.CRIT_DAMAGE_MULTI) or 1.5
-        import random
-        if random.random() < crit_chance:
-            damage *= crit_multi
 
         shot_speed = self.stats.get(StatDefinition.SHOT_SPEED) or 5.0
         knockback = self.stats.get(StatDefinition.ATTACK_KNOCKBACK) or 64.0

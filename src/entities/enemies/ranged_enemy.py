@@ -68,14 +68,40 @@ class RangedEnemy(BaseEnemy):
             self.anim_time = 0
             self.frame_index = 0
             self.texture = self.textures[self.frame_index]
+            
+    def _has_line_of_sight(self) -> bool:
+        if not self._barrier_list or not getattr(self._barrier_list, "blocking_sprites", None):
+            return True
+        return arcade.has_line_of_sight(self.position, self._player.position, self._barrier_list.blocking_sprites)
         
-    def update_behavior(self, delta_time: float) -> None:
-        attack_range = self.stats.get(StatDefinition.ATTACK_RANGE)
+    def _follow_path(self) -> None:
+        if getattr(self, "invulnerable_timer", 0.0) > 0.3:
+            return
 
-        if self._get_distance_to_player() > attack_range:
-            self._follow_path()
+        dist = self._get_distance_to_player()
+        attack_range = self.stats.get(StatDefinition.ATTACK_RANGE) or 250.0
+        flee_range = 100.0
+
+        if dist < flee_range:
+            # Si el jugador está muy cerca, HUIMOS (Kiting)
+            dx = self.center_x - self._player.center_x
+            dy = self.center_y - self._player.center_y
+            direction = Vec2(dx, dy)
+            if direction.length() > 0:
+                from world.systems.movement.movement_events import EntityMoveEvent
+                self.event_bus.dispatch(EntityMoveEvent(self, direction.normalize()))
+        
+        elif dist > attack_range or not self._has_line_of_sight():
+            super()._follow_path()
         else:
             self._stop()
+
+    def update_behavior(self, delta_time: float) -> None:
+        dist = self._get_distance_to_player()
+        attack_range = self.stats.get(StatDefinition.ATTACK_RANGE) or 250.0
+        flee_range = 100.0
+
+        if flee_range <= dist <= attack_range and self._has_line_of_sight():
             self._try_shoot(delta_time)
 
     def _try_shoot(self, delta_time: float) -> None:

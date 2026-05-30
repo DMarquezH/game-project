@@ -46,7 +46,7 @@ class EnemyWaveSystem(BaseSystem):
 
     def setup(
         self,
-        waves: list[WaveDefinition],
+        generator, # Recibe la función
         player: Player,
         scene: arcade.Scene,
         movement_system: MovementSystem,
@@ -55,7 +55,7 @@ class EnemyWaveSystem(BaseSystem):
         bounds: arcade.Rect = None,
     ):
         super().init()
-        self._waves = waves
+        self._wave_generator = generator
         self._player = player
         self._scene = scene
         self._movement_system = movement_system
@@ -67,26 +67,24 @@ class EnemyWaveSystem(BaseSystem):
         self._viewport_h = 540.0
         self.event_bus.subscribe(ViewportChangedEvent, self._on_viewport_changed)
         self.event_bus.subscribe(EntityDeadEvent, self._on_entity_dead)
-        self._start_wave(0)
+        self._start_wave(1)
 
     def _on_viewport_changed(self, event: ViewportChangedEvent) -> None:
         self._viewport_w = event.width
         self._viewport_h = event.height
 
     def _start_wave(self, index: int) -> None:
-        if index >= len(self._waves):
-            self.event_bus.dispatch(AllWavesCompleteEvent())
-            return
-
         self._current_wave_index = index
-        wave = self._waves[index]
+        wave = self._wave_generator(index)
+        self._current_wave = wave 
+        
         self._current_interval = wave.spawn_interval
         self._spawn_timer = 0.0
 
         # construye la cola de spawns
         self._spawn_queue.clear()
         for entry in wave.entries:
-            self._spawn_queue.extend([entry.enemy_type] * entry.count)
+            self._spawn_queue.extend([(entry.enemy_type, entry.level)] * entry.count)
         random.shuffle(self._spawn_queue)
 
     def _advance_wave(self):
@@ -111,8 +109,8 @@ class EnemyWaveSystem(BaseSystem):
         self._spawn_timer += delta_time
         if self._spawn_timer >= self._current_interval:
             self._spawn_timer = 0.0
-            enemy_type = self._spawn_queue.pop(0)
-            self._spawn_enemy(enemy_type)
+            enemy_type, custom_level = self._spawn_queue.pop(0)
+            self._spawn_enemy(enemy_type, custom_level)
 
     def _check_wave_complete(self):
         if self._spawn_queue:
@@ -122,10 +120,19 @@ class EnemyWaveSystem(BaseSystem):
 
     # --- Spawn ---
 
-    def _spawn_enemy(self, enemy_type: type[BaseEnemy]):
+    def _spawn_enemy(self, enemy_type: type[BaseEnemy], custom_level: int = None):
         position = self._get_spawn_position()
 
         enemy = enemy_type(event_bus = self.event_bus, player = self._player, barrier_list = self._barrier_list,)
+        if custom_level is not None:
+            level_to_apply = custom_level
+        else:
+            if hasattr(self, "_current_wave"):
+                level_to_apply = self._current_wave.enemy_level
+            else:
+                level_to_apply = 1
+        enemy.apply_level(level_to_apply)
+            
         enemy.position = position
 
         self._scene.add_sprite("Enemies", enemy)
@@ -134,7 +141,12 @@ class EnemyWaveSystem(BaseSystem):
         self._active_enemies.add(enemy)
         
         if self._walls:
-            self.enemy_physics.append(arcade.PhysicsEngineSimple(enemy, self._walls))
+            from entities.enemies.boss_enemy import BossEnemy
+            if isinstance(enemy, BossEnemy):
+                # Fantasma: Sin paredes con las que chocar, pero necesita motor físico para actualizar sus coordenadas
+                self.enemy_physics.append(arcade.PhysicsEngineSimple(enemy, arcade.SpriteList()))
+            else:
+                self.enemy_physics.append(arcade.PhysicsEngineSimple(enemy, self._walls))
 
     def _get_spawn_position(self) -> tuple[float, float]:
         cx, cy = self._player.position

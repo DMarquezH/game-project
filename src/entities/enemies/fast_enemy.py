@@ -10,26 +10,30 @@ from world.systems.combat.entity_stats import StatDefinition
 from settings.registered_gameplay_events import EntityAttackedMeleeEvent
 
 
-class MeleeEnemy(BaseEnemy):
+class FastEnemy(BaseEnemy):
 
-    ATTACK_DISTANCE = 50.0 
+    ATTACK_DISTANCE = 25.0 
 
     def __init__(self, event_bus: EventBus, player: Player, barrier_list=None):
         super().__init__(event_bus, player, barrier_list)
         self._attack_timer = 0.0
+        
+        # chikIbai
+        self.scale = 0.2
+        self.anim_fps = 1/15
 
     def _setup_stats(self) -> None:
         # Randomizamos levemente las estadisticas base
-        health = random.uniform(40.0, 60.0)
-        damage = random.uniform(8.0, 15.0)
-        speed = random.uniform(1.8, 2.3)
+        health = random.uniform(20.0, 40.0)
+        damage = random.uniform(3.0, 5.0)
+        speed = random.uniform(3.0, 5.0)
         
         self.stats.set(StatDefinition.MOVEMENT_SPEED, speed)
         self.stats.set(StatDefinition.MAX_HEALTH, health)
         self.stats.set(StatDefinition.HEALTH, health)
         self.stats.set(StatDefinition.ATTACK_DAMAGE, damage)
-        self.stats.set(StatDefinition.ATTACK_SPEED, 1.0) # 1 ataque por segundo
-        self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64.0)
+        self.stats.set(StatDefinition.ATTACK_SPEED, 3.0)
+        self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 32.0)
 
     def _setup_texture(self) -> None:
         sheet = arcade.load_spritesheet(GameResources.get("textures")/ "entity" / "enemy_spritesheet.png")

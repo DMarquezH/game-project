@@ -20,12 +20,12 @@ class LevelLoader:
 
             # no se puede hacer un A* para cada enemigo asi q hay q hacer todos loas enemigos de mas o menos el mismo tamaño
              # cambie el sprite de slime por un cuaadrado por q no furulaba con el zombie ese nuevo
-            enemy = arcade.SpriteSolidColor(84, 116, arcade.color.WHITE)
+            enemy = arcade.SpriteSolidColor(100, 100, arcade.color.WHITE)
 
             return arcade.AStarBarrierList(
                 moving_sprite = enemy,
                 blocking_sprites = blocking_sprites,
-                grid_size = 42,
+                grid_size = 64,
                 left = int(level.bounds.left),
                 right = int(level.bounds.right),
                 bottom = int(level.bounds.bottom),
