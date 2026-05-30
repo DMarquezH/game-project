@@ -52,7 +52,7 @@ class Player(BaseEntity):
         self.stats.set(StatDefinition.SHOT_SPEED, 5.0) # Velocidad del proyectil
         self.stats.set(StatDefinition.MAX_HEALTH, 100.0)
         self.stats.set(StatDefinition.HEALTH, 100.0)
-        self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 128.0)
+        self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64.0)
         self.stats.set(StatDefinition.ATTACK_RANGE, Player.DEFAULT_MELEE_RANGE)
         self.stats.set(StatDefinition.SWING_AMPLITUDE, Player.DEFAULT_MELEE_AMPLITUDE)
         self.stats.set(StatDefinition.DEFENSE, 0.0)

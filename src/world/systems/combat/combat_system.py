@@ -1,6 +1,8 @@
 import arcade
                     
 import math
+from entities.enemies.boss_enemy import BossEnemy
+from world.systems.movement.movement_events import EntityMoveEvent
 from pyglet.math import Vec2
 from entities.player_entity import Player
 from entities.enemies.base_enemy import BaseEnemy
@@ -45,7 +47,7 @@ class CombatSystem(BaseSystem):
 
     def on_entity_attacked_melee(self, event: EntityAttackedMeleeEvent):
         if not self.scene: return
-        swipe = MeleeSwipeEntity(event.attacker, event.attacker_pos, event.attack_dir, event.attack_range, event.amplitude, event.damage, event.knockback, event.life_time)
+        swipe = MeleeSwipeEntity(event.attacker, event.attacker_pos, event.attack_dir, event.attack_range, event.amplitude, event.damage, event.knockback, event.life_time, event.offset_distance)
         self.scene.add_sprite("MeleeSwipes", swipe)
         self.scene.add_sprite("Hitboxes", swipe)
 
@@ -191,15 +193,13 @@ class CombatSystem(BaseSystem):
         # Reset Iframes
         target.invulnerable_timer = 0.5
         
-        # Knockback usando el Evento de Movimiento nativo
-        if knockback > 0.0:
+        # Knockback 
+        if knockback > 0.0 and not isinstance(target, BossEnemy):
             kb_dir = (Vec2(target.center_x, target.center_y) - Vec2(attacker.center_x, attacker.center_y)).normalize()
-            
-            # Reducimos la inyección de velocidad a la mitad (0.25 en lugar de 0.5)
             speed = target.stats.get(StatDefinition.MOVEMENT_SPEED) or 1.0
             fake_dir = kb_dir * ((knockback * 0.25) / speed)
             
-            from world.systems.movement.movement_events import EntityMoveEvent
+            
             self.event_bus.dispatch(EntityMoveEvent(target, fake_dir))
             
         if target.stats.get(StatDefinition.HEALTH) <= 0:

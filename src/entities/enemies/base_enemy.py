@@ -11,7 +11,7 @@ from world.systems.combat.entity_stats import StatDefinition
 
 class BaseEnemy(BaseEntity, ABC):
     PATH_RECALCULATE_INTERVAL = 0.5
-    WAYPOINT_THRESHOLD        = 64
+    WAYPOINT_THRESHOLD        = 24
 
     def __init__( self, event_bus: EventBus, player: Player, barrier_list: arcade.AStarBarrierList):
         super().__init__(event_bus)

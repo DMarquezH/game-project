@@ -14,7 +14,7 @@ from world.systems.movement.movement_events import EntityMoveEvent
 
 class BossEnemy(BaseEnemy):
 
-    ATTACK_DISTANCE = 140.0 
+    ATTACK_DISTANCE = 130.0 
 
     def __init__(self, event_bus: EventBus, player: Player, barrier_list=None):
         super().__init__(event_bus, player, barrier_list)
@@ -29,7 +29,7 @@ class BossEnemy(BaseEnemy):
 
     def _setup_stats(self) -> None:
         health = 1200.0
-        damage = 25.0
+        damage = 40.0
         speed = 1.2
         
         self.stats.set(StatDefinition.MOVEMENT_SPEED, speed)
@@ -129,8 +129,9 @@ class BossEnemy(BaseEnemy):
             attacker=self,
             attacker_pos=self.position,
             attack_dir=direction,
-            attack_range=self.ATTACK_DISTANCE,
-            amplitude=240.0,
+            attack_range=256.0,  # Largo del rectángulo 
+            amplitude=144.0,     # Ancho del rectángulo 
             damage=damage,
-            knockback=knockback
+            knockback=knockback,
+            offset_distance=0.0  # Centrado en el jefe
         ))
