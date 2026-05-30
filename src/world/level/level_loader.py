@@ -14,7 +14,7 @@ class LevelLoader:
 
     def _build_barrier_list(self, level: BaseLevel) -> arcade.AStarBarrierList:
             # como va con sprites para las hitbox no se puede meter en la clase de nivel
-            blocking_sprites = arcade.SpriteList()
+            blocking_sprites = arcade.SpriteList(use_spatial_hash=True)
             for name in level.collision_layers:
                 blocking_sprites.extend(self.tile_map.sprite_lists[name])
 

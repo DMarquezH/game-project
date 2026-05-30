@@ -15,6 +15,8 @@ class RangedEnemy(BaseEnemy):
     def __init__(self, event_bus: EventBus, player: Player, barrier_list=None):
         super().__init__(event_bus, player, barrier_list)
         self._shoot_timer = 0.0
+        self._los_timer = 0.0
+        self._has_los = False
 
     def _setup_stats(self) -> None:
         health = random.uniform(20.0, 40.0)
@@ -68,11 +70,6 @@ class RangedEnemy(BaseEnemy):
             self.anim_time = 0
             self.frame_index = 0
             self.texture = self.textures[self.frame_index]
-            
-    def _has_line_of_sight(self) -> bool:
-        if not self._barrier_list or not getattr(self._barrier_list, "blocking_sprites", None):
-            return True
-        return arcade.has_line_of_sight(self.position, self._player.position, self._barrier_list.blocking_sprites)
         
     def _follow_path(self) -> None:
         if getattr(self, "invulnerable_timer", 0.0) > 0.3:
@@ -91,17 +88,25 @@ class RangedEnemy(BaseEnemy):
                 from world.systems.movement.movement_events import EntityMoveEvent
                 self.event_bus.dispatch(EntityMoveEvent(self, direction.normalize()))
         
-        elif dist > attack_range or not self._has_line_of_sight():
+        elif dist > attack_range or not self._has_los:
             super()._follow_path()
         else:
             self._stop()
 
     def update_behavior(self, delta_time: float) -> None:
+        self._los_timer -= delta_time
+        if self._los_timer <= 0:
+            self._los_timer = 0.25
+            if not self._barrier_list or not getattr(self._barrier_list, "blocking_sprites", None):
+                self._has_los = True
+            else:
+                self._has_los = arcade.has_line_of_sight(self.position, self._player.position, self._barrier_list.blocking_sprites, 300)
+
         dist = self._get_distance_to_player()
         attack_range = self.stats.get(StatDefinition.ATTACK_RANGE) or 250.0
         flee_range = 100.0
 
-        if flee_range <= dist <= attack_range and self._has_line_of_sight():
+        if flee_range <= dist <= attack_range and self._has_los:
             self._try_shoot(delta_time)
 
     def _try_shoot(self, delta_time: float) -> None:
