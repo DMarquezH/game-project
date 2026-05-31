@@ -9,7 +9,6 @@ Controles:
     - Pausar / Reanudar: Escape
     - Pantalla completa: F11
     - Ver hitboxes: (debug) F3
-    - Abrir tienda (debug): P
 
 Mecánicas de combate:
 
