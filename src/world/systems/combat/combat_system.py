@@ -1,6 +1,8 @@
 import arcade
                     
 import math
+from entities.enemies.boss_enemy import BossEnemy
+from world.systems.movement.movement_events import EntityMoveEvent
 from pyglet.math import Vec2
 from entities.player_entity import Player
 from entities.enemies.base_enemy import BaseEnemy
@@ -11,6 +13,9 @@ from entities.combat.projectile_entity import ProjectileEntity
 from entities.combat.melee_swipe_entity import MeleeSwipeEntity
 from world.systems.combat.entity_stats import StatDefinition
 from world.systems.movement.movement_events import EntityMoveEvent
+from world.systems.combat.damage_numbers import DamageNumber
+import random
+
 
 class CombatSystem(BaseSystem):
 
@@ -31,6 +36,8 @@ class CombatSystem(BaseSystem):
         self._pickups = self.scene.get_sprite_list("Pickups")
         self._hitboxes = self.scene.get_sprite_list("Hitboxes")
         self._hurtboxes = self.scene.get_sprite_list("Hurtboxes")
+        
+        self._damage_numbers = []
 
     def init(self):
         if self._initialized: return
@@ -40,7 +47,7 @@ class CombatSystem(BaseSystem):
 
     def on_entity_attacked_melee(self, event: EntityAttackedMeleeEvent):
         if not self.scene: return
-        swipe = MeleeSwipeEntity(event.attacker, event.attacker_pos, event.attack_dir, event.attack_range, event.amplitude, event.damage, event.knockback, event.life_time)
+        swipe = MeleeSwipeEntity(event.attacker, event.attacker_pos, event.attack_dir, event.attack_range, event.amplitude, event.damage, event.knockback, event.life_time, event.offset_distance)
         self.scene.add_sprite("MeleeSwipes", swipe)
         self.scene.add_sprite("Hitboxes", swipe)
 
@@ -68,6 +75,15 @@ class CombatSystem(BaseSystem):
                 
         self._check_parry_collisions()
         self._check_hitbox_collisions()
+        
+        for dn in self._damage_numbers[:]:
+            dn.update(delta_time)
+            if dn.timer >= dn.lifetime:
+                self._damage_numbers.remove(dn)
+
+    def draw(self):
+        for dn in self._damage_numbers:
+            dn.draw()
 
     def _check_parry_collisions(self):
         # Parry entre melés (Jugador vs Enemigo)
@@ -142,32 +158,48 @@ class CombatSystem(BaseSystem):
                                     break
 
     def _apply_damage_and_knockback(self, target, damage, knockback, attacker, attack_entity):
+        is_critical = False
+        actual_damage = damage
+        
+        if isinstance(attacker, Player):
+            crit_chance = attacker.stats.get(StatDefinition.CRIT_CHANCE) or 0.05
+            crit_damage = attacker.stats.get(StatDefinition.CRIT_DAMAGE_MULTI) or 1.5
+            if random.random() < crit_chance:
+                actual_damage *= crit_damage
+                is_critical = True
+
         # Apply armor (percentage reduction)
         armor = target.stats.get(StatDefinition.ARMOR) or 0.0
         # Cap armor at 80% to prevent invincibility
         armor = min(0.8, armor)
-        damage_after_armor = damage * (1.0 - armor)
+        damage_after_armor = actual_damage * (1.0 - armor)
         
         # Calculate damage reduction based on defense
         defense = target.stats.get(StatDefinition.DEFENSE) or 0.0
-        actual_damage = max(1.0, damage_after_armor - defense)
+        final_damage = max(1.0, damage_after_armor - defense)
 
         # Damage
-        target.stats.decrease(StatDefinition.HEALTH, actual_damage)
-        self.event_bus.dispatch(EntityDamagedEvent(target, actual_damage))
+        target.stats.decrease(StatDefinition.HEALTH, final_damage)
+        self.event_bus.dispatch(EntityDamagedEvent(target, final_damage))
+        
+        # Floating damage numbers
+        if isinstance(attacker, Player) and isinstance(target, BaseEnemy):
+            text_str = f"{int(final_damage)}"
+            if is_critical:
+                text_str += "!!"
+            color = arcade.color.RED if is_critical else arcade.color.WHITE
+            self._damage_numbers.append(DamageNumber(text_str, target.center_x, target.center_y + 30, color, is_critical))
         
         # Reset Iframes
         target.invulnerable_timer = 0.5
         
-        # Knockback usando el Evento de Movimiento nativo
-        if knockback > 0.0:
+        # Knockback 
+        if knockback > 0.0 and not isinstance(target, BossEnemy):
             kb_dir = (Vec2(target.center_x, target.center_y) - Vec2(attacker.center_x, attacker.center_y)).normalize()
-            
-            # Reducimos la inyección de velocidad a la mitad (0.25 en lugar de 0.5)
             speed = target.stats.get(StatDefinition.MOVEMENT_SPEED) or 1.0
             fake_dir = kb_dir * ((knockback * 0.25) / speed)
             
-            from world.systems.movement.movement_events import EntityMoveEvent
+            
             self.event_bus.dispatch(EntityMoveEvent(target, fake_dir))
             
         if target.stats.get(StatDefinition.HEALTH) <= 0:

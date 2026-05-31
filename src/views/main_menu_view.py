@@ -5,7 +5,7 @@ from core.display import BaseView
 from services.input.input_service import InputService
 from services.navigation_service import NavigationService
 from services.event_service import EventBus
-from settings.registered_gameplay_events import GameStartedEvent
+from settings.registered_gameplay_events import GameStartedEvent, PlayMusicEvent
 from settings.game_resources import GameResources
 from settings.registered_views import RegisteredViews
 from ui.grid_button_builder import GridButtons
@@ -36,14 +36,6 @@ class MainMenuView(BaseView):
                 "count": 2,
             },
             {
-                "sheet": menu_textures / "button_opciones_spritesheet.png",
-                "action": None,
-                "width": 300,
-                "height": 138,
-                "columns": 2,
-                "count": 2,
-            },
-            {
                 "sheet": menu_textures / "button_salir_spritesheet.png",
                 "action": lambda: arcade.close_window(),
                 "width": 300,
@@ -55,7 +47,7 @@ class MainMenuView(BaseView):
 
         self.botones = GridButtons(self.button_data, space_between=50, event_bus=self.event_bus)
         self.imagen: arcade.Texture = arcade.load_texture(menu_textures / "main_menu_background.png")
-
+        self.event_bus.dispatch(PlayMusicEvent("soundtrack1"))
         self.ui.add(self.botones)
 
     def _start_game(self):

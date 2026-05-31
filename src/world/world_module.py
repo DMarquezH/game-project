@@ -5,11 +5,14 @@ from arcade import Scene, PhysicsEngineSimple
 from pip._internal.resolution.resolvelib import candidates
 
 from entities.base_entity import BaseEntity
+from entities.enemies.boss_enemy import BossEnemy
+from entities.enemies.fast_enemy import FastEnemy
 from entities.item_entity import ItemEntity
 from services.event_service import EventBus, BaseEvent
 from entities.player_entity import Player
+from services.input.settings.registered_input_events import ToggleDebugInputEvent
 from settings.game_resources import GameResources
-from services.input.settings.registered_input_events import ToggleDebugInputEvent, ToggleShopInputEvent
+
 from settings.registered_gameplay_events import RerollShopEvent, ToggleShopEvent, BuyItemEvent
 
 from world.level.registered_levels import RegisteredLevels
@@ -24,7 +27,7 @@ from world.level.level_events import LevelChangeRequestEvent, LevelChangedEvent
 
 import json
 import random
-
+from settings.registered_gameplay_events import EntityDeadEvent, CoinCollectedEvent
 from world.systems.shop_system import ShopInstance
 from world.systems.enemy_wave_system import EnemyWaveSystem, WaveCompleteEvent, AllWavesCompleteEvent
 from entities.enemies.melee_enemy import MeleeEnemy
@@ -142,11 +145,11 @@ class World:
 
         ### SCENE ###
 
-        self.scene.add_sprite_list_after("player", "Floor")
+        self.scene.add_sprite_list_after("player", "Obstacles")
 
         ### ENEMIGOS ###
 
-        self.scene.add_sprite_list_after("Enemies", "Floor")
+        self.scene.add_sprite_list_after("Enemies", "Obstacles")
         
         ### COMBATE ###
         self.scene.add_sprite_list("Hurtboxes")
@@ -178,12 +181,10 @@ class World:
         self.barrier_list = data.barrier_list
 
     def _init_wave_system(self, data: LevelLoader):
-        waves = self._generate_waves()
-
         wave_system: EnemyWaveSystem = self.systems.get(EnemyWaveSystem)
         walls = [self.scene[name] for name in data.collision_layers]
         wave_system.setup(
-            waves = waves,
+            generator = self._generate_waves,
             player = self.player,
             scene = self.scene,
             movement_system = self.systems.get(MovementSystem),
@@ -192,67 +193,88 @@ class World:
             bounds = self.current_level.bounds
         )
 
-    def _generate_waves(self):
-        waves = []
-        for i in range(10):
-            wave_number = i + 1  # 1-indexed para la lógica de diseño
-
-            enemy_count = 3 + (wave_number * 2)
-
-            spawn_interval = max(0.4, 2.0 - (wave_number * 0.15))
-
-            # TODO: Ronda 10 para el jefe
-            # if wave_number == 10:
-            #     entries = [
-            #         EnemySpawnEntry(BossEnemy, 1),
-            #         EnemySpawnEntry(MeleeEnemy, enemy_count // 2),
-            #     ]
-            # else:
-
-            melee_count = enemy_count
-            ranged_count = (melee_count // 3) * 2
-
-            entries = [
-                EnemySpawnEntry(MeleeEnemy, melee_count),
-                EnemySpawnEntry(RangedEnemy, ranged_count)
-            ]
-
-            waves.append(WaveDefinition(entries=entries, spawn_interval=spawn_interval))
-
-        return waves
+    def _generate_waves(self, wave_number: int) -> WaveDefinition:
+        cycle = (wave_number - 1) // 10
+        phase_round = ((wave_number - 1) % 10) + 1
+        enemy_level = cycle + 1
+        
+        # Estancamos el contador base en la ronda 5 para no reventar el juego
+        round_type = min(phase_round, 5) 
+        base_count = 3 + (round_type * 2)
+        spawn_interval = max(0.4, 2.0 - (round_type * 0.15))
+        
+        total_melee_equivalent = base_count
+        base_ranged_count = (base_count // 3) * 2
+        total_enemies = total_melee_equivalent + base_ranged_count
+        
+        entries = []
+        
+        if phase_round == 10:
+            # Boss round
+            entries.append(EnemySpawnEntry(BossEnemy, 1, level=enemy_level))
+            entries.append(EnemySpawnEntry(RangedEnemy, base_count // 4, level=enemy_level))
+        elif phase_round <= 3:
+            entries.append(EnemySpawnEntry(MeleeEnemy, total_melee_equivalent, level=enemy_level))
+            entries.append(EnemySpawnEntry(RangedEnemy, base_ranged_count, level=enemy_level))
+        elif phase_round <= 6:
+            step = phase_round - 3
+            fast_count = int(total_melee_equivalent * (step / 3.0))
+            melee_count = total_melee_equivalent - fast_count
+            
+            if melee_count > 0:
+                entries.append(EnemySpawnEntry(MeleeEnemy, melee_count, level=enemy_level))
+            if fast_count > 0:
+                advanced_fast = max(1, int(fast_count * 0.2)) if phase_round > 4 else 0
+                normal_fast = fast_count - advanced_fast
+                if normal_fast > 0:
+                    entries.append(EnemySpawnEntry(FastEnemy, normal_fast, level=enemy_level))
+                if advanced_fast > 0:
+                    entries.append(EnemySpawnEntry(FastEnemy, advanced_fast, level=enemy_level + 1))
+            entries.append(EnemySpawnEntry(RangedEnemy, base_ranged_count, level=enemy_level))
+        else:
+            step = phase_round - 6
+            remaining_fast = int(total_melee_equivalent * (1.0 - (step / 3.0)))
+            new_ranged_count = total_enemies - remaining_fast
+            
+            if remaining_fast > 0:
+                entries.append(EnemySpawnEntry(FastEnemy, remaining_fast, level=enemy_level))
+            if new_ranged_count > 0:
+                advanced_ranged = max(1, int(new_ranged_count * 0.2)) if phase_round > 7 else 0
+                normal_ranged = new_ranged_count - advanced_ranged
+                if normal_ranged > 0:
+                    entries.append(EnemySpawnEntry(RangedEnemy, normal_ranged, level=enemy_level))
+                if advanced_ranged > 0:
+                    entries.append(EnemySpawnEntry(RangedEnemy, advanced_ranged, level=enemy_level + 1))
+            
+        wave = WaveDefinition(entries=entries, spawn_interval=spawn_interval)
+        wave.enemy_level = enemy_level 
+        return wave
 
     def _subscribe_events(self):
         self.event_bus.subscribe(ToggleDebugInputEvent, self.toggle_debug)
-        self.event_bus.subscribe(ToggleShopInputEvent, self.open_shop)
         self.event_bus.subscribe(RerollShopEvent, self.on_shop_reroll)
         self.event_bus.subscribe(BuyItemEvent,self.update_stats)
         self.event_bus.subscribe(WaveCompleteEvent, self._on_wave_complete)
         self.event_bus.subscribe(AllWavesCompleteEvent, self._on_all_waves_complete)
         self.event_bus.subscribe(LevelChangeRequestEvent, self._on_level_change_request)
-        from settings.registered_gameplay_events import EntityDeadEvent, CoinCollectedEvent
         self.event_bus.subscribe(EntityDeadEvent, self._on_entity_dead)
         self.event_bus.subscribe(CoinCollectedEvent, self._on_coin_collected)
 
     def _unsubscribe_events(self):
         self.event_bus.unsubscribe(ToggleDebugInputEvent, self.toggle_debug)
-        self.event_bus.unsubscribe(ToggleShopInputEvent, self.open_shop)
         self.event_bus.unsubscribe(RerollShopEvent, self.on_shop_reroll)
         self.event_bus.unsubscribe(BuyItemEvent,self.update_stats)
         self.event_bus.unsubscribe(WaveCompleteEvent, self._on_wave_complete)
         self.event_bus.unsubscribe(AllWavesCompleteEvent, self._on_all_waves_complete)
         self.event_bus.unsubscribe(LevelChangeRequestEvent, self._on_level_change_request)
-        from settings.registered_gameplay_events import EntityDeadEvent, CoinCollectedEvent
         self.event_bus.unsubscribe(EntityDeadEvent, self._on_entity_dead)
         self.event_bus.unsubscribe(CoinCollectedEvent, self._on_coin_collected)
 
 
     def _on_wave_complete(self, _: WaveCompleteEvent):
         self._completed_waves += 1
-
-        # Cada 5 rondas tienda
-        if self._completed_waves % 5 == 0:
-            self._shop_delay_active = True
-            self._shop_delay_timer = self.SHOP_DELAY_SECONDS
+        self._shop_delay_active = True
+        self._shop_delay_timer = self.SHOP_DELAY_SECONDS
 
     def _on_all_waves_complete(self, _: AllWavesCompleteEvent):
         self._pending_level_change = True
@@ -333,6 +355,10 @@ class World:
     def draw(self):
 
         self.scene.draw()
+        
+        combat_system: CombatSystem = self.systems.get(CombatSystem)
+        if combat_system:
+            combat_system.draw()
 
         if self.debug:
             self.scene.draw_hit_boxes(arcade.color.RED, 3)
@@ -371,17 +397,13 @@ class World:
         return random.sample(candidatos,final_count)
 
     def on_shop_reroll(self, event: RerollShopEvent):
+
         shop = event.shop
-        shop.reroll()
-        shop.load_new_items(self.randomize_items(shop.used_items))
+        if shop.current_reroll_cost <= self.coins:
+            self.coins -= shop.current_reroll_cost
+            shop.reroll()
+            shop.load_new_items(self.randomize_items(shop.used_items))
 
-    def open_shop(self, _: ToggleShopInputEvent):
-
-        items = self.randomize_items()
-        shop = ShopInstance(self.event_bus, items)
-
-        self.event_bus.dispatch(ToggleShopEvent(shop))
-        # Cambiar evento
     def update_stats(self, event: BuyItemEvent):
         price = event.item.cost
         if price <= self.coins:

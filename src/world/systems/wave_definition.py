@@ -6,9 +6,11 @@ from entities.enemies.base_enemy import BaseEnemy
 class EnemySpawnEntry:
     enemy_type: type[BaseEnemy]
     count: int
+    level: int | None = None
 
 
 @dataclass
 class WaveDefinition:
     entries: list[EnemySpawnEntry]
     spawn_interval: float = 1.0
+    enemy_level: int = 1

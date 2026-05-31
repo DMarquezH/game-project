@@ -2,9 +2,9 @@ import arcade
 import arcade.gui
 
 from services.event_service import EventBus, BaseEvent
-from services.input.settings.registered_input_events import ToggleShopInputEvent
+
 from settings.game_resources import GameResources
-from settings.registered_gameplay_events import RerollShopEvent, BuyItemEvent
+from settings.registered_gameplay_events import RerollShopEvent, BuyItemEvent, ToggleShopEvent
 from ui.base_gui_controller import BaseGuiController
 from ui.widgets.score_widget import ScoreWidget
 from ui.widgets.base_button import BaseButton
@@ -38,7 +38,7 @@ class ShopController(BaseGuiController):
             image_height=138,
             columns=2,
             count=2,
-            action=lambda:self.event_bus.dispatch(ToggleShopInputEvent()),
+            action=lambda:self.event_bus.dispatch(ToggleShopEvent(self.shop)),
             scale=0.8
         )
         self.reroll_widget = ScoreWidget(GameResources.get("textures") / "ui" / "hud"/ "coin_highres.png",text=f"{self.shop.current_reroll_cost} Reroll")

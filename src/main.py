@@ -2,7 +2,7 @@ from typing import Type
 
 import arcade
 
-from services.input.settings.registered_input_events import ToggleFullscreenInputEvent
+
 from settings.registered_views import RegisteredViews
 from core.registry import Registry
 from core.display import BaseWindow, BaseView
@@ -15,6 +15,7 @@ from services.audio_service import AudioService
 from settings.game_constants import GameConstants
 from settings.game_resources import GameResources
 from services.input.settings.registered_input_contexts import RegisteredInputContexts
+from views.game_over_view import GameOverView
 
 from views.main_menu_view import MainMenuView
 from views.game_view import GameView
@@ -35,10 +36,7 @@ class MainWindow(BaseWindow):
 
     def init(self):
         event_bus = self.service_container.get(EventBus)
-        event_bus.subscribe(ToggleFullscreenInputEvent, self._toggle_fullscreen)
 
-    def _toggle_fullscreen(self, _: ToggleFullscreenInputEvent):
-        self.set_fullscreen(not self.fullscreen)
 
 
 def register_views(view_registry: Registry[Type[BaseView]]):
@@ -47,6 +45,7 @@ def register_views(view_registry: Registry[Type[BaseView]]):
 
     view_registry.register(RegisteredViews.MAIN_MENU, MainMenuView)
     view_registry.register(RegisteredViews.GAME, GameView)
+    view_registry.register(RegisteredViews.GAME_OVER, GameOverView)
 
     view_registry.freeze()
 

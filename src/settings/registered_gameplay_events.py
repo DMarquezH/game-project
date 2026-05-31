@@ -9,7 +9,7 @@ from world.systems.shop_system import ShopInstance
 
 class EntityAttackedMeleeEvent(BaseEvent):
 
-    def __init__(self, attacker, attacker_pos: Vec2, attack_dir: Vec2, attack_range: float, amplitude: float, damage: float, knockback: float = 0.0, life_time: float = 0.2):
+    def __init__(self, attacker, attacker_pos: Vec2, attack_dir: Vec2, attack_range: float, amplitude: float, damage: float, knockback: float = 0.0, life_time: float = 0.2, offset_distance: float = None):
         super().__init__()
         self.attacker = attacker
         self.attacker_pos = attacker_pos
@@ -19,6 +19,7 @@ class EntityAttackedMeleeEvent(BaseEvent):
         self.damage = damage
         self.knockback = knockback
         self.life_time = life_time
+        self.offset_distance = offset_distance
 
 class EntityAttackedRangedEvent(BaseEvent):
 
@@ -96,3 +97,7 @@ class CoinCollectedEvent(BaseEvent):
     def __init__(self, amount: int = 1):
         super().__init__()
         self.amount = amount
+
+class GameOverEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()

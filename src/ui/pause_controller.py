@@ -27,14 +27,6 @@ class PauseController(BaseGuiController):
                 "count": 2,
             },
             {
-                "sheet": menu_textures / "button_opciones_spritesheet.png",
-                "action": None,
-                "width": 300,
-                "height": 138,
-                "columns": 2,
-                "count": 2,
-            },
-            {
                 "sheet": menu_textures / "button_menu_principal_spritesheet.png",
                 "action": lambda: self.current_view.nav_service.navigate(RegisteredViews.MAIN_MENU),
                 "width": 300,

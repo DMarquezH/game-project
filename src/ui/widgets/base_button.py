@@ -30,8 +30,8 @@ class BaseButton(gui.UITextureButton):
                 tex_normal = self.texture_list[0]
                 tex_hover = self.texture_list[1]
 
-            super().__init__(width=image_width*scale,height=image_height*scale,x=x,y=y,texture=tex_normal,texture_hovered=tex_hover)
-            self.action = action
+        super().__init__(width=image_width*scale,height=image_height*scale,x=x,y=y,texture=tex_normal,texture_hovered=tex_hover)
+        self.action = action
 
         if widget:
             self.add(child=widget,anchor_x="center",anchor_y="center")

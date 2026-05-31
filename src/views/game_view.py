@@ -8,13 +8,15 @@ from services.input.devices.mouse_device import MouseInputDevice
 from services.input.input_service import InputService
 from services.navigation_service import NavigationService
 from services.input.settings.registered_input_contexts import RegisteredInputContexts
-from services.input.settings.registered_input_events import TogglePauseInputEvent, ToggleShopInputEvent
-from settings.registered_gameplay_events import ToggleShopEvent, RerollShopEvent, PlayMusicEvent, PopupOpenedEvent
+
+from settings.registered_gameplay_events import ToggleShopEvent, RerollShopEvent, PlayMusicEvent, PopupOpenedEvent, \
+    GameOverEvent
+from settings.registered_views import RegisteredViews
 from world.level.level_events import LevelChangedEvent
 from ui.shop_controller import ShopController
 from world.systems.enemy_wave_system import WaveCompleteEvent
 from world.systems.shop_system import ShopInstance
-from services.input.settings.registered_input_events import ViewportChangedEvent
+from services.input.settings.registered_input_events import ViewportChangedEvent, TogglePauseInputEvent
 from world.world_module import World
 from ui.hud_controller import HudController
 from ui.pause_controller import PauseController
@@ -30,7 +32,7 @@ class GameView(BaseView):
 
         self.active_keyboard_inputs = set()
         self.world = World(event_bus)
-        self.hud = HudController()
+        self.hud = HudController(self.world.player.stats)
         self.pause_menu = PauseController(self, event_bus)
         self.shop_menu = ShopController(event_bus)
 
@@ -48,12 +50,15 @@ class GameView(BaseView):
         self.event_bus.subscribe(RerollShopEvent, self.on_reroll_shop)
         self.event_bus.subscribe(LevelChangedEvent, self._on_level_changed)
         self.event_bus.subscribe(WaveCompleteEvent, self.hud.update_wave)
+        self.event_bus.subscribe(GameOverEvent, self._game_over)
 
     def _unsubscribe_listeners(self):
         self.event_bus.unsubscribe(TogglePauseInputEvent, self.on_toggle_pause)
         self.event_bus.unsubscribe(ToggleShopEvent, self.on_toggle_shop)
         self.event_bus.unsubscribe(RerollShopEvent, self.on_reroll_shop)
         self.event_bus.unsubscribe(LevelChangedEvent, self._on_level_changed)
+        self.event_bus.unsubscribe(WaveCompleteEvent, self.hud.update_wave)
+        self.event_bus.unsubscribe(GameOverEvent, self._game_over)
 
     def on_show_view(self):
 
@@ -95,15 +100,16 @@ class GameView(BaseView):
             self.world.update(dt)
             self.world_camera.update(dt)
             
-            # Actualizar HUD
-            if self.world.player:
-                from world.systems.combat.entity_stats import StatDefinition
-                health = self.world.player.stats.get(StatDefinition.HEALTH)
-                max_health = self.world.player.stats.get(StatDefinition.MAX_HEALTH)
-                if health is not None and max_health is not None:
-                    self.hud.set_health(int(health), int(max_health))
+            # Actualizar HUD -> ahora se actualiza tambien cuando el juego etsa pausado
+        if self.world.player:
+            from world.systems.combat.entity_stats import StatDefinition
+            health = self.world.player.stats.get(StatDefinition.HEALTH)
+            max_health = self.world.player.stats.get(StatDefinition.MAX_HEALTH)
+            if health is not None and max_health is not None:
+                self.hud.set_health(int(health), int(max_health))
             
-            self.hud.set_coins(self.world.coins)
+        self.hud.set_coins(self.world.coins)
+        self.hud.update_stats(self.world.player)
 
     def on_draw(self):
         super().on_draw()
@@ -196,3 +202,6 @@ class GameView(BaseView):
             clamp_rect=self.world.get_level_bounds()
         )
         self.world_camera.cam.match_window()
+
+    def _game_over(self, event: GameOverEvent):
+        self.nav_service.navigate(RegisteredViews.GAME_OVER)

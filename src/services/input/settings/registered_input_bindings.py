@@ -9,15 +9,6 @@ from services.input.settings.registered_input_actions import *
 
 class RegisteredInputBindings:
 
-    ### GENERAL ###
-
-    TOGGLE_FULLSCREEN = SimpleInputBinding(
-        KeyboardInputDevice.signature_from_key(
-            arcade.key.F11
-        ),
-        ToggleFullscreenInputAction(),
-        InputTrigger.PRESS
-    )
 
     ### GAMEPLAY ###
 
@@ -69,10 +60,3 @@ class RegisteredInputBindings:
 
     ### SHOP TEMP ###
 
-    TOGGLE_SHOP = SimpleInputBinding(
-        KeyboardInputDevice.signature_from_key(
-            arcade.key.P
-        ),
-        ToggleShopInputAction(),
-        InputTrigger.PRESS
-    )
