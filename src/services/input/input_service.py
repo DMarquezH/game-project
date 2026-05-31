@@ -87,7 +87,7 @@ class InputService(Service):
             binding = context.bindings.get(game_input.signature)
             if not binding: continue
 
-            if binding.trigger == InputTrigger.HOLD and not trigger == InputTrigger.CHANGE:
+            if binding.trigger == InputTrigger.HOLD: # and not trigger == InputTrigger.CHANGE:
                 self._process_input_state(game_input, binding, trigger)
                 continue
 
@@ -100,7 +100,9 @@ class InputService(Service):
 
         signature = game_input.signature
 
-        if trigger == InputTrigger.PRESS:
+        # print(self.active_inputs)
+
+        if trigger == InputTrigger.PRESS or trigger == InputTrigger.CHANGE:
             active_input = ActiveInput(signature, binding, game_input.value)
             self.active_inputs[game_input.signature] = active_input
 

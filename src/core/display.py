@@ -24,7 +24,14 @@ class BaseView(arcade.View):
         super().__init__()
         self.input_service = input_service
 
+        self.last_mouse_pos = (0, 0)
+        self.active_mouse_buttons = []
+
     def on_update(self, dt: float):
+
+        if self.active_mouse_buttons:
+            self.on_mouse_tick()
+
         self.input_service.update()
 
     def on_draw(self):
@@ -39,10 +46,22 @@ class BaseView(arcade.View):
         self.input_service.register_release(inp)
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
-        inp = MouseInputDevice.from_button(button, x, y)
+
+        if button not in self.active_mouse_buttons:
+            self.active_mouse_buttons.append(button)
+
+        self.last_mouse_pos = (x, y)
+
+        nx, ny = self.get_mouse_pos()
+
+        inp = MouseInputDevice.from_button(button, nx, ny)
         self.input_service.register_press(inp)
 
     def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
+
+        if button in self.active_mouse_buttons:
+            self.active_mouse_buttons.remove(button)
+
         inp = MouseInputDevice.from_button(button, x, y)
         self.input_service.register_release(inp)
 
@@ -51,12 +70,29 @@ class BaseView(arcade.View):
         self.input_service.register_change(inp)
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+        self.last_mouse_pos = (x, y)
         inp = MouseInputDevice.from_motion(x, y, dx, dy)
         self.input_service.register_change(inp)
 
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, button: int, _modifiers: int):
-        inp = MouseInputDevice.from_drag(button, x, y, dx, dy)
+
+        self.last_mouse_pos = (x, y)
+        nx, ny = self.get_mouse_pos()
+
+        inp = MouseInputDevice.from_button(button, nx, ny)
         self.input_service.register_change(inp)
+
+    def on_mouse_tick(self):
+
+        x, y = self.get_mouse_pos()
+
+        for button in self.active_mouse_buttons:
+
+            inp = MouseInputDevice.from_button(button, x, y)
+            self.input_service.register_press(inp)
+
+    def get_mouse_pos(self):
+        return self.last_mouse_pos
 
 
 class GameCamera:

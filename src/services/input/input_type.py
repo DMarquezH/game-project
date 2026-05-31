@@ -9,6 +9,9 @@ class InputType(ABC):
     def __str__(self) -> str:
         pass
 
+    def __repr__(self):
+        return self.__str__()
+
 
 class EmptyInput(InputType):
 
