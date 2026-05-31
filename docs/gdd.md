@@ -72,6 +72,7 @@ Definición de los sistemas que estarán en funcionamiento a lo largo de la ejec
    - Spawn position: fuera del viewport del jugador (margen de 80px extra), con validación de límites del mapa.
    - Los enemigos usan pathfinding A* (arcade.astar_calculate_path) recalculado cada 0.5s.
    - Al completar las 10 oleadas, las 10 siguientes tendran enemigos de elite y mayor nivel (con estadisticas aumentadas).
+   - Al completar las 10 oleadas, las 10 siguientes tendran enemigos de elite y mayor nivel (con estadisticas aumentadas).
 
    
 2) Sistema de Combate (CombatSystem):
@@ -79,6 +80,7 @@ Definición de los sistemas que estarán en funcionamiento a lo largo de la ejec
    -	Fuego amigo desactivado: jugador no se daño a si mismo ni a otros jugadores; enemigos no se dañan entre si.
    -	Invulnerabilidad temporal (iframes): 0.5s tras recibir un golpe.
    -	Cálculo de daño: Daño final = max(1, (dañó * (1 - armadura)) - defensa). Armadura máxima al 80%.
+   -	Knockback: se inyecta vía EntityMoveEvent pausando primero todas las demás ordenes de movimiento de la entidad con intensidad proporcional al knockback / velocidad_movimiento.
    -	Knockback: se inyecta vía EntityMoveEvent pausando primero todas las demás ordenes de movimiento de la entidad con intensidad proporcional al knockback / velocidad_movimiento.
 
 3) Sistema de Movimiento (MovementSystem):
@@ -213,12 +215,30 @@ Especificación de aspectos, atributos y comportamientos de los NPCs y enemigos 
 
 -	Comportamiento: persigue al jugador.  Cuando está a >=50px, se detiene y ataca en area.
 -	Ataque: EntityAttackedMeleeEvent con amplitud de 144 grados.
+-	Animación: misma estructura que el enemigo melee.
+- Estadísticas: HEALTH ATTACK_DAMAGE, MOVEMENT_SPEED, ATTACK_SPEED, ATTACK_RANGE, SHOT_SPEED, ATTACK_KNOCKBACK.
+
+
+
+### Enemigo Rapido (FastEnemy)
+
+-	Comportamiento: persigue al jugador rapidamente mediante A*.  Cuando está a <= 50px, se detiene y ataca.
+-	Ataque: EntityAttackedMeleeEvent con amplitud de 90 grados y ATTACK_SPEED aumentada.
+-	Animación: misma estructura que el enemigo melee.
+- Estadísticas: HEALTH ATTACK_DAMAGE, MOVEMENT_SPEED, ATTACK_SPEED, ATTACK_RANGE, SHOT_SPEED, ATTACK_KNOCKBACK.
+
+
+### Jefe (BossEnemy)
+
+-	Comportamiento: persigue al jugador.  Cuando está a >=50px, se detiene y ataca en area.
+-	Ataque: EntityAttackedMeleeEvent con amplitud de 144 grados.
 -	Animación: 4 direcciones y un ataque en area.
 - Estadísticas: HEALTH ATTACK_DAMAGE, MOVEMENT_SPEED, ATTACK_SPEED, ATTACK_RANGE, SHOT_SPEED, ATTACK_KNOCKBACK.
 
 
 ### Drops
 
+-	Al morir cualquier enemigo: 3-8 monedas con físicas de impulso (vel. aleatoria), cada una otorga 10-25 monedas de tienda.
 -	Al morir cualquier enemigo: 3-8 monedas con físicas de impulso (vel. aleatoria), cada una otorga 10-25 monedas de tienda.
 -	10% de probabilidad de soltar un HeartPickupEntity que recupera vida al ser recogido.
 
@@ -251,7 +271,11 @@ Especificación de la música y el sonido del juego.
 -   La gestion de sonidos se aprovecha del gran uso de eventos para la mayoria de acciones en el juego,
     hay 3 maneras de reproducir los sonidos siendo 2 para los audios cortos (si hay variaciones, al azar) y 1 para los audios largos
     que se cargan desde la MP.
+-   La gestion de sonidos se aprovecha del gran uso de eventos para la mayoria de acciones en el juego,
+    hay 3 maneras de reproducir los sonidos siendo 2 para los audios cortos (si hay variaciones, al azar) y 1 para los audios largos
+    que se cargan desde la MP.
 -	Música de gameplay: soundtrack3-edit.mp3 (se inicia al entrar en GameView).
+-	Música de menu principal: soundtrack1.mp3.
 -	Música de menu principal: soundtrack1.mp3.
 
 
