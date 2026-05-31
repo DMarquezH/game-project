@@ -8,7 +8,7 @@ class WaveWidget(gui.UIAnchorLayout):
     def __init__(self):
         super().__init__()
         self.box = gui.UIBoxLayout(vertical=True, space_between=10, align="right")
-        self.textures = arcade.load_spritesheet(GameResources.get("textures") / "ui" / "hud" / "wave_spritesheet.png").get_texture_grid((456,464),10,30)
+        self.textures = arcade.load_spritesheet(GameResources.get("textures") / "ui" / "hud" / "wave_spritesheet.png").get_texture_grid((456,464),10,10)
         
         self.wave_number = 1
         
@@ -23,7 +23,8 @@ class WaveWidget(gui.UIAnchorLayout):
         
         for char in str(self.wave_number):
             digit = int(char)
-            tex_index = digit
+            # if order is 1,2,3...9,0:
+            tex_index = digit - 1 if digit > 0 else 9
             
             widget = gui.UIImage(texture=self.textures[tex_index], width=50, height=100)
             self.wave_box.add(widget)
