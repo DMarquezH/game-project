@@ -10,8 +10,9 @@ from entities.enemies.fast_enemy import FastEnemy
 from entities.item_entity import ItemEntity
 from services.event_service import EventBus, BaseEvent
 from entities.player_entity import Player
+from services.input.settings.registered_input_events import ToggleDebugInputEvent
 from settings.game_resources import GameResources
-from services.input.settings.registered_input_events import ToggleDebugInputEvent, ToggleShopInputEvent
+
 from settings.registered_gameplay_events import RerollShopEvent, ToggleShopEvent, BuyItemEvent
 
 from world.level.registered_levels import RegisteredLevels
@@ -251,7 +252,6 @@ class World:
 
     def _subscribe_events(self):
         self.event_bus.subscribe(ToggleDebugInputEvent, self.toggle_debug)
-        self.event_bus.subscribe(ToggleShopInputEvent, self.open_shop)
         self.event_bus.subscribe(RerollShopEvent, self.on_shop_reroll)
         self.event_bus.subscribe(BuyItemEvent,self.update_stats)
         self.event_bus.subscribe(WaveCompleteEvent, self._on_wave_complete)
@@ -262,7 +262,6 @@ class World:
 
     def _unsubscribe_events(self):
         self.event_bus.unsubscribe(ToggleDebugInputEvent, self.toggle_debug)
-        self.event_bus.unsubscribe(ToggleShopInputEvent, self.open_shop)
         self.event_bus.unsubscribe(RerollShopEvent, self.on_shop_reroll)
         self.event_bus.unsubscribe(BuyItemEvent,self.update_stats)
         self.event_bus.unsubscribe(WaveCompleteEvent, self._on_wave_complete)
@@ -405,13 +404,6 @@ class World:
             shop.reroll()
             shop.load_new_items(self.randomize_items(shop.used_items))
 
-    def open_shop(self, _: ToggleShopInputEvent):
-
-        items = self.randomize_items()
-        shop = ShopInstance(self.event_bus, items)
-
-        self.event_bus.dispatch(ToggleShopEvent(shop))
-        # Cambiar evento
     def update_stats(self, event: BuyItemEvent):
         price = event.item.cost
         if price <= self.coins:

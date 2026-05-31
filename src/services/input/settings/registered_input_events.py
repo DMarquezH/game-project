@@ -4,8 +4,6 @@ from entities.item_entity import ItemEntity
 from services.event_service import BaseEvent
 
 
-class ToggleFullscreenInputEvent(BaseEvent):
-    pass
 
 
 class PlayerMoveInputEvent(BaseEvent):
@@ -35,13 +33,8 @@ class TogglePauseInputEvent(BaseEvent):
 class ToggleDebugInputEvent(BaseEvent):
     pass
 
-class ToggleShopInputEvent(BaseEvent):
-    pass
 
-    def __init__(self):
-        super().__init__()
-
-class ViewportChangedEvent(BaseEvent):  # no se si esto deberia ir aqui pero como no rompe nada pues lo dejo de mientras
+class ViewportChangedEvent(BaseEvent):
     def __init__(self, width: float, height: float):
         super().__init__()
         self.width = width

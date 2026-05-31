@@ -97,3 +97,7 @@ class CoinCollectedEvent(BaseEvent):
     def __init__(self, amount: int = 1):
         super().__init__()
         self.amount = amount
+
+class GameOverEvent(BaseEvent):
+    def __init__(self):
+        super().__init__()

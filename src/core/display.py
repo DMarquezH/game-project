@@ -1,3 +1,5 @@
+from calendar import TUESDAY
+
 import arcade
 from arcade import Camera2D
 
@@ -5,7 +7,7 @@ from core.service_container import ServiceContainer
 from services.input.devices.keyboard_device import KeyboardInputDevice
 from services.input.devices.mouse_device import MouseInputDevice
 from services.input.input_service import InputService
-from services.input.settings.registered_input_events import ToggleFullscreenInputEvent
+
 
 
 class BaseWindow(arcade.Window):
@@ -13,6 +15,7 @@ class BaseWindow(arcade.Window):
     def __init__(self, service_container: ServiceContainer, width: int, height: int, title: str):
         super().__init__(width, height, title)
         self.service_container = service_container
+        self.set_fullscreen(True)
 
 
 class BaseView(arcade.View):

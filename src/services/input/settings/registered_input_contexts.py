@@ -12,7 +12,6 @@ class RegisteredInputContexts:
     @staticmethod
     def init():
 
-        RegisteredInputContexts.GENERAL.bind(RegisteredInputBindings.TOGGLE_FULLSCREEN)
 
         RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.PLAYER_MOVE_WASD)
         RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.PLAYER_MOVE_ARROWS)
@@ -23,6 +22,3 @@ class RegisteredInputContexts:
         RegisteredInputContexts.PAUSE.bind(RegisteredInputBindings.TOGGLE_PAUSE)
 
         RegisteredInputContexts.DEBUG.bind(RegisteredInputBindings.TOGGLE_DEBUG)
-
-        RegisteredInputContexts.SHOP.bind(RegisteredInputBindings.TOGGLE_SHOP)
-        RegisteredInputContexts.GAMEPLAY.bind(RegisteredInputBindings.TOGGLE_SHOP)

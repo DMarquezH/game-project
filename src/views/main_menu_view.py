@@ -36,14 +36,6 @@ class MainMenuView(BaseView):
                 "count": 2,
             },
             {
-                "sheet": menu_textures / "button_opciones_spritesheet.png",
-                "action": None,
-                "width": 300,
-                "height": 138,
-                "columns": 2,
-                "count": 2,
-            },
-            {
                 "sheet": menu_textures / "button_salir_spritesheet.png",
                 "action": lambda: arcade.close_window(),
                 "width": 300,

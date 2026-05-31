@@ -4,10 +4,7 @@ from services.input.input_type import AxisInput, EmptyInput
 from services.input.settings.registered_input_events import *
 
 
-class ToggleFullscreenInputAction(InputAction):
 
-    def activate(self, event_bus: EventBus, input_value: T):
-        event_bus.dispatch(ToggleFullscreenInputEvent())
 
 
 class PlayerMoveInputAction(InputAction):
@@ -52,7 +49,3 @@ class ToggleDebugInputAction(InputAction):
 
     def activate(self, event_bus: EventBus, input_value: EmptyInput):
         event_bus.dispatch(ToggleDebugInputEvent())
-
-class ToggleShopInputAction(InputAction):
-    def activate(self, event_bus: EventBus, input_value: EmptyInput):
-        event_bus.dispatch(ToggleShopInputEvent())

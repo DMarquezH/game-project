@@ -9,7 +9,7 @@ from world.systems.base_system import BaseSystem
 from world.systems.movement.movement_system import MovementSystem, MovementMode
 from world.systems.wave_definition import WaveDefinition, EnemySpawnEntry
 from services.input.settings.registered_input_events import ViewportChangedEvent
-from settings.registered_gameplay_events import EntityDeadEvent
+from settings.registered_gameplay_events import EntityDeadEvent, GameOverEvent
 from entities.enemies.boss_enemy import BossEnemy
 
 class WaveCompleteEvent:
@@ -197,8 +197,7 @@ class EnemyWaveSystem(BaseSystem):
             entity.kill()
             self._check_wave_complete()
         elif isinstance(entity, Player):
-            print("GAME OVER")
-            # GameOverEvent() o asi pero me dio pereza
+            self.event_bus.dispatch(GameOverEvent())
             entity.kill()
 
     def dispose(self) -> None:

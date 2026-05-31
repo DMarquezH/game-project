@@ -17,6 +17,6 @@ class WaveWidget(gui.UIAnchorLayout):
         self.add(self.box, anchor_x="right", anchor_y="top", align_x=-10, align_y=-10)
 
     def update_wave(self):
-        if self.active_texture<= 29: self.active_texture += 1
+        if self.active_texture< 29: self.active_texture += 1
         self.widget.texture = self.textures[self.active_texture]
 
