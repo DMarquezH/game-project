@@ -1,4 +1,5 @@
 import arcade
+import arcade.gui as gui
 from arcade.gui import UIManager
 
 from core.display import BaseView
@@ -44,11 +45,20 @@ class MainMenuView(BaseView):
                 "count": 2,
             }
         ]
-
+        self.box = gui.UIBoxLayout(vertical=True, space_between=200).with_padding(top=100)
+        image_logo = arcade.load_texture(menu_textures / "logo.png")
+        self.logo = gui.UIImage(texture=image_logo,width=image_logo.width/2,height=image_logo.height/2)
         self.botones = GridButtons(self.button_data, space_between=50, event_bus=self.event_bus)
         self.imagen: arcade.Texture = arcade.load_texture(menu_textures / "main_menu_background.png")
         self.event_bus.dispatch(PlayMusicEvent("soundtrack1"))
-        self.ui.add(self.botones)
+
+        self.box.add(self.logo)
+        self.box.add(self.botones)
+
+        self.anchor = gui.UIAnchorLayout()
+        self.anchor.add(self.box,anchor_x="center",anchor_y="top")
+
+        self.ui.add(self.anchor)
 
     def _start_game(self):
         self.event_bus.dispatch(GameStartedEvent())

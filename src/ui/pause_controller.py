@@ -1,3 +1,4 @@
+import arcade.gui as gui
 from services.event_service import EventBus
 from settings.game_resources import GameResources
 from services.input.settings.registered_input_events import TogglePauseInputEvent
@@ -15,7 +16,6 @@ class PauseController(BaseGuiController):
         self.current_view = view
 
         menu_textures = GameResources.get("textures") / "ui" / "menus"
-        sounds = GameResources.get("sounds")
 
         button_list = [
             {
@@ -37,7 +37,9 @@ class PauseController(BaseGuiController):
 
         ]
         self.botones = GridButtons(button_list,space_between=50,background=menu_textures / "pause_background.png", event_bus=self.event_bus)
-        self.manager.add(self.botones)
+        self.anchor = gui.UIAnchorLayout()
+        self.anchor.add(self.botones,anchor_x="center",anchor_y="center")
+        self.manager.add(self.anchor)
 
     def enable(self):
         super().enable()

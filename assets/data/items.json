@@ -1,7 +1,6 @@
 [
   {
     "name": "Health Potion",
-    "description": "Recupera 75 de vida al adquirirla",
     "cost": 750,
     "value": 75,
     "texture": "items/health_item.png",
@@ -9,7 +8,6 @@
   },
   {
     "name": "Max Health Up",
-    "description": "Aumenta la vida máxima permanente en 25",
     "cost": 1500,
     "value": 25,
     "texture": "items/healthmax_item.png",
@@ -17,7 +15,6 @@
   },
   {
     "name": "Attack Damage",
-    "description": "Aumenta el daño de los ataques en 5",
     "cost": 2000,
     "value": 5,
     "texture": "items/attackdamage.png",
@@ -25,7 +22,6 @@
   },
   {
     "name": "Attack Speed",
-    "description": "Aumenta la velocidad de ataque (porcentual)",
     "cost": 2800,
     "value": 0.15,
     "texture": "items/attackspeed.png",
@@ -33,7 +29,6 @@
   },
   {
     "name": "Movement Speed",
-    "description": "Aumenta la velocidad de movimiento (porcentual)",
     "cost": 1600,
     "value": 0.20,
     "texture": "items/movementspeed_item.png",
@@ -41,7 +36,6 @@
   },
   {
     "name": "Attack Range",
-    "description": "Incrementa el alcance de ataque cuerpo a cuerpo y la distancia de los proyectiles",
     "cost": 1000,
     "value": 16,
     "texture": "items/attackrange_item.png",
@@ -49,7 +43,6 @@
   },
   {
     "name": "Shot Speed",
-    "description": "Aumenta la velocidad de los proyectiles",
     "cost": 1300,
     "value": 1.20,
     "texture": "items/shotspeed_item.png",
@@ -57,7 +50,6 @@
   },
   {
     "name": "Critical Chance",
-    "description": "Aumenta la probabilidad de golpe crítico en 5%",
     "cost": 2000,
     "value": 0.05,
     "texture": "items/critchance_item.png",
@@ -65,7 +57,6 @@
   },
   {
     "name": "Critical Multiplier",
-    "description": "Aumenta el multiplicador de daño crítico en 25%",
     "cost": 2500,
     "value": 0.25,
     "texture": "items/critmul_item.png",
@@ -73,7 +64,6 @@
   },
   {
     "name": "Knockback",
-    "description": "Incrementa el retroceso que provocan tus ataques",
     "cost": 900,
     "value": 1.2,
     "texture": "items/knockback_item.png",
@@ -81,7 +71,6 @@
   },
   {
     "name": "Shot Pierce",
-    "description": "Permite que los proyectiles atraviesen 1 enemigo adicional",
     "cost": 5000,
     "value": 1,
     "texture": "items/shotpierce_item.png",
@@ -89,7 +78,6 @@
   },
   {
     "name": "Armour",
-    "description": "Armadura ligera que reduce un 10% el daño recibido",
     "cost": 1300,
     "value": 0.1,
     "texture": "items/armour_item.png",
