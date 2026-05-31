@@ -15,6 +15,8 @@ class RangedEnemy(BaseEnemy):
     def __init__(self, event_bus: EventBus, player: Player, barrier_list=None):
         super().__init__(event_bus, player, barrier_list)
         self._shoot_timer = 0.0
+        self.event_bus.subscribe(EntityAttackedRangedEvent, self.attack_animation)
+
         self._los_timer = 0.0
         self._has_los = False
 
@@ -34,43 +36,43 @@ class RangedEnemy(BaseEnemy):
         self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64.0)
 
     def _setup_texture(self) -> None:
-        sheet = arcade.load_spritesheet(GameResources.get("textures") / "entity" / "enemy_spritesheet.png")
-        self.textures = sheet.get_texture_grid((209, 270), 6, 16)
+        sheet = arcade.load_spritesheet(GameResources.get("textures") / "entity" / "enemy2_spritesheet.png")
+        self.textures = sheet.get_texture_grid((209, 270), 6, 18)
         self.texture = self.textures[0]
 
     def _setup_animation(self) -> None:
-        self.walk_down = [0, 1, 2, 3]
-        self.walk_up = [4, 5, 6, 7]
-        self.walk_right = [8, 9, 10, 11]
-        self.walk_left = [12, 13, 14, 15]
+        self.walk_down = [0, 1]
+        self.walk_up = [2,3]
+        self.walk_right = [4,5,6]
+        self.walk_left = [7,8,9]
 
-    def update_animation(self, delta_time: float) -> None:
-        moving = abs(self.change_x) > 0.1 or abs(self.change_y) > 0.1
-        if moving:
-            if abs(self.change_x) > abs(self.change_y):
-                if self.change_x > 0:
-                    current_frames = self.walk_right
-                else:
-                    current_frames = self.walk_left
+        self.attack_down = [10,11]
+        self.attack_up = [16,17]
+        self.attack_right = [12,13]
+        self.attack_left = [14,15]
+
+    def attack_animation(self, event: EntityAttackedRangedEvent):
+        # Filtro para que solo ataquen los que realmente han atacado
+        if event.attacker is not self:
+            return
+
+        direction = event.attack_dir
+
+        if abs(direction.x) > abs(direction.y):
+            if direction.x > 0:
+                self.last_dir = "right"
             else:
-                if self.change_y > 0:
-                    current_frames = self.walk_up
-                else:
-                    current_frames = self.walk_down
-
-            self.anim_time += delta_time
-
-            while self.anim_time >= self.anim_fps:
-                self.anim_time -= self.anim_fps
-                self.frame_index = (self.frame_index + 1) % len(current_frames)
-
-            self.texture = self.textures[current_frames[self.frame_index]]
-
+                self.last_dir = "left"
         else:
-            self.anim_time = 0
-            self.frame_index = 0
-            self.texture = self.textures[self.frame_index]
-        
+            if direction.y > 0:
+                self.last_dir = "up"
+            else:
+                self.last_dir = "down"
+
+        self.anim_state = "attack"
+        self.frame_index = 0
+        self.anim_time = 0.0
+
     def _follow_path(self) -> None:
         if getattr(self, "invulnerable_timer", 0.0) > 0.3:
             return
@@ -87,7 +89,7 @@ class RangedEnemy(BaseEnemy):
             if direction.length() > 0:
                 from world.systems.movement.movement_events import EntityMoveEvent
                 self.event_bus.dispatch(EntityMoveEvent(self, direction.normalize()))
-        
+
         elif dist > attack_range or not self._has_los:
             super()._follow_path()
         else:

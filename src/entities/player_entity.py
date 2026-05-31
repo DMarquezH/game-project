@@ -2,7 +2,7 @@ import arcade
 from arcade import Texture, SpriteSheet
 
 from entities.base_entity import BaseEntity
-from services.event_service import EventBus
+from services.event_service import EventBus, BaseEvent
 from services.input.settings.registered_input_events import PlayerAttackInputEvent, PlayerMoveInputEvent, PlayerRangedAttackInputEvent
 from settings.registered_gameplay_events import EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityFootstepEvent
 from world.systems.combat.entity_stats import StatDefinition
@@ -26,21 +26,12 @@ class Player(BaseEntity):
 
 
         self.sprite_sheet= sheet
-        self.textures: list[Texture] = self.sprite_sheet.get_texture_grid((209,270),6,17)
+        self.textures: list[Texture] = self.sprite_sheet.get_texture_grid((209,270),8,41)
 
 
-        #Definicion de texturas
-        self.left_frames = [12,13,14,15]
-        self.right_frames = [8,9,10,11]
-        self.up_frames = [4,5,6,7]
-        self.down_frames = [0,1,2,3]
-        self.static_frame = 16
+        self._setup_amimation()
 
-        self.anim_time = 0
-        self.anim_fps = 1/6
-        self.moving_frame = 0
 
-        self.texture = self.textures[self.static_frame]
         self._attack_timer = 0.0
         self._init_stats()
         self._subscribe_events()
@@ -66,11 +57,16 @@ class Player(BaseEntity):
         self.event_bus.subscribe(PlayerMoveInputEvent, self._move)
         self.event_bus.subscribe(PlayerAttackInputEvent, self._attack_melee)
         self.event_bus.subscribe(PlayerRangedAttackInputEvent, self._attack_ranged)
+        self.event_bus.subscribe(EntityAttackedRangedEvent,self._update_anim_state)
+        self.event_bus.subscribe(EntityAttackedMeleeEvent, self._update_anim_state)
+
 
     def _unsubscribe_events(self):
         self.event_bus.unsubscribe(PlayerMoveInputEvent, self._move)
         self.event_bus.unsubscribe(PlayerAttackInputEvent, self._attack_melee)
         self.event_bus.unsubscribe(PlayerRangedAttackInputEvent, self._attack_ranged)
+        self.event_bus.unsubscribe(EntityAttackedRangedEvent, self._update_anim_state)
+        self.event_bus.unsubscribe(EntityAttackedMeleeEvent, self._update_anim_state)
 
     def _move(self, event: PlayerMoveInputEvent):
         # Stun: no nos movemos voluntariamente si acabamos de recibir un buen golpe
@@ -143,25 +139,109 @@ class Player(BaseEntity):
     def dispose(self):
         self._unsubscribe_events()
 
+    def _setup_amimation(self):
+        self.walk_left_frames = [12, 13, 14, 15]
+        self.walk_right_frames = [8, 9, 10, 11]
+        self.walk_up_frames = [4, 5, 6, 7]
+        self.walk_down_frames = [0, 1, 2, 3]
+        self.static_frame = 16
+
+        self.punch_down = [17,18,19]
+        self.punch_left = [20,21,22]
+        self.punch_right = [23,24,25]
+        self.punch_up = [26,27,28]
+
+        self.shoot_down = [29,30,31]
+        self.shoot_left = [32,33,34]
+        self.shoot_right = [35,36,37]
+        self.shoot_up = [38,39,40]
+
+        self.anim_time = 0
+        self.anim_state = "walk"
+        self.last_dir = "down"
+        self.anim_fps = 1 / 8
+        self.moving_frame = 0
+
+        self.texture = self.textures[self.static_frame]
+    def _update_anim_state(self, event:EntityAttackedRangedEvent | EntityAttackedMeleeEvent):
+        if event.attacker is not self:
+            return
+
+        direction = event.attack_dir
+
+        if abs(direction.x) > abs(direction.y):
+            if direction.x > 0:
+                self.last_dir = "right"
+            else:
+                self.last_dir = "left"
+        else:
+            if direction.y > 0:
+                self.last_dir = "up"
+            else:
+                self.last_dir = "down"
+        if event.__class__ == EntityAttackedMeleeEvent: self.anim_state = "punch"
+        else: self.anim_state = "shoot"
     def update_animation(self, delta_time: float = 1 / 60, *args, **kwargs) -> None:
+        moving = abs(self.change_x) > 0.1 or abs(self.change_y) > 0.1
         if self._attack_timer > 0:
             self._attack_timer -= delta_time
             
         self.update_invulnerability(delta_time)
         self.hurtbox.sync_position()
+        if self.anim_state == "punch":
+            if self.last_dir == "right":
+                current_frames = self.punch_right
+            elif self.last_dir == "left":
+                current_frames = self.punch_left
+            elif self.last_dir == "up":
+                current_frames = self.punch_up
+            else:
+                current_frames = self.punch_down
+            self.anim_time += delta_time
+            while self.anim_time >= self.anim_fps:
+                self.anim_time -= self.anim_fps
+                self.moving_frame += 1
+                if self.moving_frame >= len(current_frames):
+                    self.anim_state = "walk"
+                    self.moving_frame = 0
+                    return
+            if self.moving_frame >= len(current_frames):
+                self.moving_frame = 0
+            self.texture = self.textures[current_frames[self.moving_frame]]
+            return
+        elif self.anim_state == "shoot":
+            if self.last_dir == "right":
+                current_frames = self.shoot_right
+            elif self.last_dir == "left":
+                current_frames = self.shoot_left
+            elif self.last_dir == "up":
+                current_frames = self.shoot_up
+            else:
+                current_frames = self.shoot_down
+            self.anim_time += delta_time
+            while self.anim_time >= self.anim_fps:
+                self.anim_time -= self.anim_fps
+                self.moving_frame += 1
+                if self.moving_frame >= len(current_frames):
+                    self.anim_state = "walk"
+                    self.moving_frame = 0
+                    return
+            if self.moving_frame >= len(current_frames):
+                self.moving_frame = 0
+            self.texture = self.textures[current_frames[self.moving_frame]]
+            return
 
-        moving = abs(self.change_x) >0.1 or abs(self.change_y) >0.1
-        if moving:
+        elif self.anim_state == "walk" and moving:
             if abs(self.change_x) > abs(self.change_y):
                 if self.change_x > 0:
-                    current_frames = self.right_frames
+                    current_frames = self.walk_right_frames
                 else:
-                    current_frames = self.left_frames
+                    current_frames = self.walk_left_frames
             else:
                 if self.change_y > 0:
-                    current_frames = self.up_frames
+                    current_frames = self.walk_up_frames
                 else:
-                    current_frames = self.down_frames
+                    current_frames = self.walk_down_frames
 
             self.anim_time += delta_time
 
