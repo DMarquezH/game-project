@@ -45,7 +45,7 @@ class MainMenuView(BaseView):
                 "count": 2,
             }
         ]
-        self.box = gui.UIBoxLayout(vertical=True,space_between=150).with_padding(top=100,bottom=100)
+        self.box = gui.UIBoxLayout(vertical=True,space_between=150).with_padding(top=50,bottom=100)
         image_logo = arcade.load_texture(menu_textures / "logo.png")
         self.logo = gui.UIImage(texture=image_logo,width=image_logo.width/2,height=image_logo.height/2)
         self.botones = GridButtons(self.button_data, space_between=50, event_bus=self.event_bus,scale= 0.8)
