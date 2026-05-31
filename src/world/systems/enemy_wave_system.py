@@ -10,7 +10,7 @@ from world.systems.movement.movement_system import MovementSystem, MovementMode
 from world.systems.wave_definition import WaveDefinition, EnemySpawnEntry
 from services.input.settings.registered_input_events import ViewportChangedEvent
 from settings.registered_gameplay_events import EntityDeadEvent
-
+from entities.enemies.boss_enemy import BossEnemy
 
 class WaveCompleteEvent:
     pass
@@ -141,7 +141,6 @@ class EnemyWaveSystem(BaseSystem):
         self._active_enemies.add(enemy)
         
         if self._walls:
-            from entities.enemies.boss_enemy import BossEnemy
             if isinstance(enemy, BossEnemy):
                 # Fantasma: Sin paredes con las que chocar, pero necesita motor físico para actualizar sus coordenadas
                 self.enemy_physics.append(arcade.PhysicsEngineSimple(enemy, arcade.SpriteList()))

@@ -1,5 +1,8 @@
 import arcade
 import random
+from entities.enemies.boss_enemy import BossEnemy
+from entities.enemies.fast_enemy import FastEnemy
+from entities.enemies.ranged_enemy import RangedEnemy
 from services.event_service import EventBus
 from settings.game_resources import GameResources
 from settings.registered_gameplay_events import CoinCollectedEvent, EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityDamagedEvent, EntityFootstepEvent, UIButtonClickEvent, PopupOpenedEvent, GameStartedEvent, ItemBoughtSuccessEvent, PlayMusicEvent
@@ -44,14 +47,29 @@ class AudioService:
         self.event_bus.subscribe(PlayMusicEvent, self._on_play_music)
 
     def _on_melee_attack(self, event: EntityAttackedMeleeEvent):
-        self.play_random_sound("swipe", volume=0.5)
+        if isinstance(event.attacker, BossEnemy):
+            self.play_random_sound("boss_atack", volume=0.5, speed = random.uniform(0.8, 1.2))
+        else:
+            self.play_random_sound("swipe", volume=0.5)
+
 
     def _on_ranged_attack(self, event: EntityAttackedRangedEvent):
-        self.play_sound("gunshot", volume=0.5)
+        if isinstance(event.attacker, Player):
+            self.play_sound("gunshot-2", volume=0.2, speed = random.uniform(0.6, 0.9))
+        elif isinstance(event.attacker, RangedEnemy):
+            self.play_random_sound("ranged_dmg", volume=0.6, speed=0.8)
+            self.play_random_sound("swipe", volume=0.6)
+        
 
     def _on_entity_damaged(self, event: EntityDamagedEvent):
         if isinstance(event.entity, Player):
             self.play_random_sound("player_dmg", volume=0.8)
+        elif isinstance(event.entity, RangedEnemy):
+            self.play_random_sound("ranged_dmg", volume=0.6)
+        elif isinstance(event.entity, FastEnemy):
+            self.play_random_sound("enemy_dmg", volume=0.7, speed = 1.7)
+        elif isinstance(event.entity, BossEnemy):
+            self.play_random_sound("enemy_dmg", volume=0.6, speed = 0.5)
         else:
             self.play_random_sound("enemy_dmg", volume=0.6)
 
