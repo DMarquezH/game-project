@@ -41,8 +41,8 @@ class StatWidget(gui.UIAnchorLayout):
         if val is None:
             val = 0.0
         
-        # Formato especial para críticos
-        if stat_name == StatDefinition.CRIT_CHANCE:
+        # Formato especial para críticos y armadura
+        if stat_name in (StatDefinition.CRIT_CHANCE, StatDefinition.ARMOR):
             widget.set_text(f"{int(val * 100)}%")
         elif stat_name == StatDefinition.CRIT_DAMAGE_MULTI:
             widget.set_text(f"{val:.1f}x")

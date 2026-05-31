@@ -135,7 +135,11 @@ class EnemyWaveSystem(BaseSystem):
             
         enemy.position = position
 
-        self._scene.add_sprite("Enemies", enemy)
+        if isinstance(enemy, BossEnemy):
+            self._scene.add_sprite("Bosses", enemy)
+        else:
+            self._scene.add_sprite("Enemies", enemy)
+            
         self._scene.add_sprite("Hurtboxes", enemy.hurtbox)
         self._movement_system.add_entity(enemy, MovementMode.FLOOR)
         self._active_enemies.add(enemy)

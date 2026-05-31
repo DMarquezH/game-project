@@ -9,14 +9,26 @@ class WaveWidget(gui.UIAnchorLayout):
         super().__init__()
         self.box = gui.UIBoxLayout(vertical=True, space_between=10, align="right")
         self.textures = arcade.load_spritesheet(GameResources.get("textures") / "ui" / "hud" / "wave_spritesheet.png").get_texture_grid((456,464),10,30)
-        self.active_texture = 0
-        self.widget = gui.UIImage(texture=self.textures[self.active_texture],width=100,height=100)
-
-        self.box.add(self.widget)
+        
+        self.wave_number = 1
+        
+        self.wave_box = gui.UIBoxLayout(vertical=False, space_between=0)
+        self.box.add(self.wave_box)
 
         self.add(self.box, anchor_x="right", anchor_y="top", align_x=-10, align_y=-10)
+        self.update_display()
+
+    def update_display(self):
+        self.wave_box.clear()
+        
+        for char in str(self.wave_number):
+            digit = int(char)
+            tex_index = digit
+            
+            widget = gui.UIImage(texture=self.textures[tex_index], width=50, height=100)
+            self.wave_box.add(widget)
 
     def update_wave(self):
-        if self.active_texture< 29: self.active_texture += 1
-        self.widget.texture = self.textures[self.active_texture]
+        self.wave_number += 1
+        self.update_display()
 

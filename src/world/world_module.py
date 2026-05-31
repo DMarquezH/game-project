@@ -150,6 +150,7 @@ class World:
         ### ENEMIGOS ###
 
         self.scene.add_sprite_list_after("Enemies", "Obstacles")
+        self.scene.add_sprite_list("Bosses")
         
         ### COMBATE ###
         self.scene.add_sprite_list("Hurtboxes")
@@ -352,6 +353,8 @@ class World:
 
         for enemy in self.scene["Enemies"]:  
             enemy.on_update(delta_time)
+        for boss in self.scene["Bosses"]:
+            boss.on_update(delta_time)
     def draw(self):
 
         self.scene.draw()
