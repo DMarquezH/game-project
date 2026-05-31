@@ -152,18 +152,12 @@ class GameView(BaseView):
 
         self.pause_menu.disable()
 
-    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+    def get_mouse_pos(self):
 
+        x, y = self.last_mouse_pos
         in_world_coords = self.world_camera.cam.unproject((x, y)).xy
 
-        inp = MouseInputDevice.from_button(
-            button,
-            in_world_coords.x, in_world_coords.y
-        )
-
-        self.input_service.register_press(inp)
-
-        # TEMP
+        return in_world_coords.x, in_world_coords.y
 
     def on_toggle_shop(self, event: ToggleShopEvent):
 
@@ -172,7 +166,7 @@ class GameView(BaseView):
         else:
             self.activate_shop(event.shop)
 
-    def on_reroll_shop(self,event: RerollShopEvent):
+    def on_reroll_shop(self, event: RerollShopEvent):
         self.shop_menu.reload_items()
 
     def activate_shop(self, shop: ShopInstance):

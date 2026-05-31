@@ -35,7 +35,7 @@ class RegisteredInputBindings:
             arcade.MOUSE_BUTTON_RIGHT
         ),
         PlayerRangedAttackInputAction(),
-        InputTrigger.PRESS
+        InputTrigger.HOLD
     )
 
     ### PAUSE ###

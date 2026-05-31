@@ -17,6 +17,9 @@ class ActiveInput:
     binding: "InputBinding"
     value: InputType
 
+    def __str__(self):
+        return f"ActiveInput[signature={self.signature}, binding={self.binding}, value={self.value}]"
+
 
 class InputTrigger(Enum):
     PRESS = auto()
