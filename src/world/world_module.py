@@ -408,12 +408,17 @@ class World:
             shop.load_new_items(self.randomize_items(shop.used_items))
 
     def update_stats(self, event: BuyItemEvent):
-        price = event.item.cost
+
+        item = event.item
+        price = item.cost
+
         if price <= self.coins:
             self.coins -= price
-            self.player.stats.increase(EntityStats.resolve(event.item.stat), event.item.value)
+            self.player.stats.increase(EntityStats.resolve(item.stat), item.value)
+            if item.stat == StatDefinition.MAX_HEALTH:
+                self.player.stats.increase(StatDefinition.HEALTH, 25)
             from settings.registered_gameplay_events import ItemBoughtSuccessEvent
-            self.event_bus.dispatch(ItemBoughtSuccessEvent(event.item))
+            self.event_bus.dispatch(ItemBoughtSuccessEvent(item))
             self.event_bus.dispatch(ToggleShopEvent(event.shop))
 
         # El evento tendra: El item dodne sacamos la stat y el valor

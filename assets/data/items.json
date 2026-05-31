@@ -1,47 +1,47 @@
 [
   {
     "name": "Health Potion",
-    "description": "Recupera vida al usarla.",
-    "cost": 300,
-    "value": 25,
+    "description": "Recupera 75 de vida al adquirirla",
+    "cost": 750,
+    "value": 75,
     "texture": "items/health_item.png",
     "stat": "health"
   },
   {
     "name": "Max Health Up",
-    "description": "Aumenta la vida máxima permanente.",
-    "cost": 2200,
-    "value": 10,
+    "description": "Aumenta la vida máxima permanente en 25",
+    "cost": 1500,
+    "value": 25,
     "texture": "items/healthmax_item.png",
     "stat": "max_health"
   },
   {
     "name": "Attack Damage",
-    "description": "Aumenta el daño de los ataques.",
-    "cost": 1200,
-    "value": 10,
+    "description": "Aumenta el daño de los ataques en 5",
+    "cost": 2000,
+    "value": 5,
     "texture": "items/attackdamage.png",
     "stat": "attack_damage"
   },
   {
     "name": "Attack Speed",
-    "description": "Aumenta la velocidad de ataque (porcentual).",
-    "cost": 1800,
+    "description": "Aumenta la velocidad de ataque (porcentual)",
+    "cost": 2800,
     "value": 0.15,
     "texture": "items/attackspeed.png",
     "stat": "attack_speed"
   },
   {
     "name": "Movement Speed",
-    "description": "Aumenta la velocidad de movimiento (porcentual).",
+    "description": "Aumenta la velocidad de movimiento (porcentual)",
     "cost": 1600,
-    "value": 0.10,
+    "value": 0.20,
     "texture": "items/movementspeed_item.png",
     "stat": "movement_speed"
   },
   {
     "name": "Attack Range",
-    "description": "Incrementa el alcance de ataque cuerpo a cuerpo y la distancia de los proyectiles.",
+    "description": "Incrementa el alcance de ataque cuerpo a cuerpo y la distancia de los proyectiles",
     "cost": 1000,
     "value": 16,
     "texture": "items/attackrange_item.png",
@@ -49,7 +49,7 @@
   },
   {
     "name": "Shot Speed",
-    "description": "Aumenta la velocidad de los proyectiles.",
+    "description": "Aumenta la velocidad de los proyectiles",
     "cost": 1300,
     "value": 1.20,
     "texture": "items/shotspeed_item.png",
@@ -57,7 +57,7 @@
   },
   {
     "name": "Critical Chance",
-    "description": "Aumenta la probabilidad de golpe crítico.",
+    "description": "Aumenta la probabilidad de golpe crítico en 5%",
     "cost": 2000,
     "value": 0.05,
     "texture": "items/critchance_item.png",
@@ -65,7 +65,7 @@
   },
   {
     "name": "Critical Multiplier",
-    "description": "Aumenta el multiplicador de daño crítico.",
+    "description": "Aumenta el multiplicador de daño crítico en 25%",
     "cost": 2500,
     "value": 0.25,
     "texture": "items/critmul_item.png",
@@ -73,7 +73,7 @@
   },
   {
     "name": "Knockback",
-    "description": "Incrementa el retroceso que provocan tus ataques.",
+    "description": "Incrementa el retroceso que provocan tus ataques",
     "cost": 900,
     "value": 1.2,
     "texture": "items/knockback_item.png",
@@ -81,17 +81,17 @@
   },
   {
     "name": "Shot Pierce",
-    "description": "Permite que los proyectiles atraviesen enemigos adicionales.",
-    "cost": 1400,
+    "description": "Permite que los proyectiles atraviesen 1 enemigo adicional",
+    "cost": 5000,
     "value": 1,
     "texture": "items/shotpierce_item.png",
     "stat": "shot_pierce"
   },
   {
     "name": "Armour",
-    "description": "Armadura ligera que reduce un 20% el daño recibido.",
-    "cost": 1500,
-    "value": 0.2,
+    "description": "Armadura ligera que reduce un 10% el daño recibido",
+    "cost": 1300,
+    "value": 0.1,
     "texture": "items/armour_item.png",
     "stat": "armor"
   }

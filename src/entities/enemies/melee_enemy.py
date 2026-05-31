@@ -21,9 +21,9 @@ class MeleeEnemy(BaseEnemy):
 
     def _setup_stats(self) -> None:
         # Randomizamos levemente las estadisticas base
-        health = random.uniform(40.0, 60.0)
-        damage = random.uniform(8.0, 15.0)
-        speed = random.uniform(1.8, 2.3)
+        health = random.uniform(75.0, 100.0)
+        damage = random.uniform(15.0, 20.0)
+        speed = random.uniform(2.3, 2.8)
         
         self.stats.set(StatDefinition.MOVEMENT_SPEED, speed)
         self.stats.set(StatDefinition.MAX_HEALTH, health)

@@ -162,8 +162,8 @@ class CombatSystem(BaseSystem):
         actual_damage = damage
         
         if isinstance(attacker, Player):
-            crit_chance = attacker.stats.get(StatDefinition.CRIT_CHANCE) or 0.05
-            crit_damage = attacker.stats.get(StatDefinition.CRIT_DAMAGE_MULTI) or 1.5
+            crit_chance = attacker.stats.get(StatDefinition.CRIT_CHANCE)
+            crit_damage = attacker.stats.get(StatDefinition.CRIT_DAMAGE_MULTI)
             if random.random() < crit_chance:
                 actual_damage *= crit_damage
                 is_critical = True
@@ -191,7 +191,8 @@ class CombatSystem(BaseSystem):
             self._damage_numbers.append(DamageNumber(text_str, target.center_x, target.center_y + 30, color, is_critical))
         
         # Reset Iframes
-        target.invulnerable_timer = 0.5
+        if isinstance(target, Player):
+            target.invulnerable_timer = 0.5
         
         # Knockback 
         if knockback > 0.0 and not isinstance(target, BossEnemy):

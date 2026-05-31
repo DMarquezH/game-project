@@ -39,16 +39,16 @@ class Player(BaseEntity):
     def _init_stats(self):
         self.stats.set(StatDefinition.MOVEMENT_SPEED, self.DEFAULT_MOVEMENT_SPEED)
         self.stats.set(StatDefinition.ATTACK_DAMAGE,self.DEFAULT_MELEE_DAMAGE)
-        self.stats.set(StatDefinition.ATTACK_SPEED, 3.0) # 3 ataques por segundo por defecto
+        self.stats.set(StatDefinition.ATTACK_SPEED, 2.0) # 3 ataques por segundo por defecto
         self.stats.set(StatDefinition.SHOT_SPEED, 5.0) # Velocidad del proyectil
         self.stats.set(StatDefinition.MAX_HEALTH, 100.0)
         self.stats.set(StatDefinition.HEALTH, 100.0)
-        self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64.0)
+        self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 24.0)
         self.stats.set(StatDefinition.ATTACK_RANGE, Player.DEFAULT_MELEE_RANGE)
         self.stats.set(StatDefinition.SWING_AMPLITUDE, Player.DEFAULT_MELEE_AMPLITUDE)
         self.stats.set(StatDefinition.DEFENSE, 0.0)
         self.stats.set(StatDefinition.ARMOR, 0.0)
-        self.stats.set(StatDefinition.CRIT_CHANCE, 0.0)
+        self.stats.set(StatDefinition.CRIT_CHANCE, 0.1)
         self.stats.set(StatDefinition.CRIT_DAMAGE_MULTI, 1.5)
         self.stats.set(StatDefinition.SHOT_PIERCE, 0.0)
         self.stats.set(StatDefinition.SHOT_SPREAD, 0.0)

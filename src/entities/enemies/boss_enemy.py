@@ -28,9 +28,9 @@ class BossEnemy(BaseEnemy):
         self.hurtbox = Hurtbox(self, width=96, height=192)
 
     def _setup_stats(self) -> None:
-        health = 1200.0
+        health = 1500.0
         damage = 40.0
-        speed = 1.2
+        speed = 2.5
         
         self.stats.set(StatDefinition.MOVEMENT_SPEED, speed)
         self.stats.set(StatDefinition.MAX_HEALTH, health)

@@ -24,9 +24,9 @@ class FastEnemy(BaseEnemy):
 
     def _setup_stats(self) -> None:
         # Randomizamos levemente las estadisticas base
-        health = random.uniform(20.0, 40.0)
-        damage = random.uniform(3.0, 5.0)
-        speed = random.uniform(3.0, 5.0)
+        health = random.uniform(35.0, 50.0)
+        damage = random.uniform(10.0, 15.0)
+        speed = random.uniform(4.0, 5.0)
         
         self.stats.set(StatDefinition.MOVEMENT_SPEED, speed)
         self.stats.set(StatDefinition.MAX_HEALTH, health)

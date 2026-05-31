@@ -21,9 +21,9 @@ class RangedEnemy(BaseEnemy):
         self._has_los = False
 
     def _setup_stats(self) -> None:
-        health = random.uniform(20.0, 40.0)
-        damage = random.uniform(6.0, 12.0)
-        speed = random.uniform(1.2, 1.8)
+        health = random.uniform(50.0, 75.0)
+        damage = random.uniform(20.0, 25.0)
+        speed = random.uniform(2.75, 3.5)
         
         self.stats.set(StatDefinition.MOVEMENT_SPEED, speed)
         self.stats.set(StatDefinition.MAX_HEALTH,     health)
