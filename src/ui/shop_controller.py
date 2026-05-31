@@ -83,13 +83,11 @@ class ShopController(BaseGuiController):
             box_layout = arcade.gui.UIBoxLayout(vertical=True,space_between= 10,width=100,height=300)
 
             text_widget = arcade.gui.UILabel(text=item.name,font_size=16,align="center",font_name="Black Ops One")
-            description_widget = arcade.gui.UITextArea(text=item.description,font_size=12,width=150,height=50)
             image_widget = arcade.gui.UIImage(texture=item.texture,width=200,height=200).with_padding(top=10,left=10,right=10,bottom=10)
             price_widget = ScoreWidget(image=GameResources.get("textures") / "ui" / "hud"/ "coin_highres.png",text=str(item.cost))
 
 
             box_layout.add(text_widget)
-            box_layout.add(description_widget)
             box_layout.add(image_widget)
             # Añadimos un boton en el precio
 

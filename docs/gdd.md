@@ -2,7 +2,7 @@
 
 ## Información general
 
-- Nombre: --rellenar--
+- Nombre: Corpse Brigade
 - Género: Survivor
 - Plataforma: PC (Mínimo Windows y Linux)
 - Tecnologías: Python + Arcade
@@ -283,30 +283,40 @@ Especificación de la música y el sonido del juego.
 
 Descripción de los elementos, atributos y comportamientos de las interfaces gráficas de usuario (GUI) del juego.
 
+Todas las interfaces e interacciones se plantean que sean fluidas (transiciones) y reactivas (facil de usar y buen feedback visual) para mejorar la experiencia de usuario.
+
 ### Menú principal
 
 -	Fondo: main_menu_background.png.
--	Botones: Jugar, Opciones, Salir (con spritesheets animados para los estados normal/hover/pressed).
+-   Logo del juego (Corpse Brigade) centrado en la parte superior.
+-	Botones: Jugar y Salir (con spritesheets animados para los estados normal/hover/pressed).
 
 ### Menú de pausa
 
 -	Se activa con Escape durante la partida.
--	Botones: Reanudar, Menú Principal, Salir.
+-	Botones: Reanudar y Menú Principal
 -	El juego se congela mientras esta activo.
 
 ### HUD de la partida
 
 -	Esquina superior izquierda: icono de corazón + texto 'HP_actual/HP_maximo', icono de moneda + cantidad de monedas.
--	Esquina superior derecha: widget de oleada con spritesheet animado (30 frames) que avanza al completar cada oleada.
+-	Esquina superior derecha: Icono que muestra la oleada en la que te encuentras el jugador
+-   Muestreo de estadísticas al pasar al modo pausa o constantemente (Inspirado en The Binding of Isaac)
 
 
 ### Tienda
 
--	Se activa automáticamente tras completar oleadas múltiplo de 5 (con 1.5s de retraso).
+-	Se activa automáticamente tras completar cada oleada (con 1.5s de retraso).
 -	Muestra hasta 3 objetos con icono, nombre, descripción, coste y botón de compra.
--	Botón de Reroll para cambiar los objetos (coste incremental).
+-	Botón de Reroll para cambiar los objetos (coste incremental) siendo estos nunca iguales a los inmediatamente anteeriores
+-   Botón de siguiente para continuar con el juego después de hacer las compras deseadas.
 -	Fondo: shop_background.png.
 -	El juego se congela mientras esta activo.
+
+### Pantalla de Game Over
+-	Fondo: game_over_background.png.
+-   Texto: "Game Over" indicando al jugador su derrota
+-   Botón: "Menu Principal" para volver al menu y poder o salir del juego o volver a jugar otra partida.
 
 
 ## Juego mínimo funcional (MVP)

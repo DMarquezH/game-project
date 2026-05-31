@@ -385,7 +385,7 @@ class World:
     def load_items(self):
         list = json.load(open(GameResources.get("data") / "items.json"))
         for item in list:
-            aux_item = ItemEntity(item["texture"],item["name"],item["description"],item["cost"],item["value"],item["stat"])
+            aux_item = ItemEntity(item["texture"],item["name"],item["cost"],item["value"],item["stat"])
             self.items.append(aux_item)
 
     def randomize_items(self,used_items: list[ItemEntity] | None = None,count = 3) -> List[ItemEntity]:
