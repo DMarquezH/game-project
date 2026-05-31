@@ -20,7 +20,7 @@ class BossEnemy(BaseEnemy):
         super().__init__(event_bus, player, barrier_list)
         self._attack_timer = 0.0
         self._hover_time = 0.0
-        
+        self.event_bus.subscribe(EntityAttackedMeleeEvent, self.attack_animation)
         self.scale = 1.0
         
         if hasattr(self, "hurtbox") and self.hurtbox:
@@ -40,8 +40,8 @@ class BossEnemy(BaseEnemy):
         self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64*3)
 
     def _setup_texture(self) -> None:
-        sheet = arcade.load_spritesheet(GameResources.get("textures")/ "entity" / "enemy_spritesheet.png")
-        self.textures = sheet.get_texture_grid((209,270),6,16)
+        sheet = arcade.load_spritesheet(GameResources.get("textures")/ "entity" / "boss_spritesheet.png")
+        self.textures = sheet.get_texture_grid((209,270),7,7)
         self.texture = self.textures[0]
         self.scale = 1.0
 
@@ -49,32 +49,18 @@ class BossEnemy(BaseEnemy):
         self.alpha = 200 # Ligeramente transparente por ser un fantasma
 
     def _setup_animation(self) -> None:
-        self.walk_down = [0,1,2,3]
-        self.walk_up = [4,5,6,7]
-        self.walk_right = [8,9,10,11]
-        self.walk_left = [12,13,14,15]
-        self.attack_left = [18, 19]
-        self.attack_right = [20, 21]
-        self.attack_up = [22, 23]
-        self.attack_down = [16, 17]
+        self.walk_down = [0]
+        self.walk_up = [1]
+        self.walk_right = [2]
+        self.walk_left = [3]
+        self.attack_down = [4,5,6]
 
     def attack_animation(self, event: EntityAttackedMeleeEvent):
         # Filtro para que solo ataquen los que realmente han atacado
         if event.attacker is not self:
             return
 
-        direction = event.attack_dir
-
-        if abs(direction.x) > abs(direction.y):
-            if direction.x > 0:
-                self.last_dir = "right"
-            else:
-                self.last_dir = "left"
-        else:
-            if direction.y > 0:
-                self.last_dir = "up"
-            else:
-                self.last_dir = "down"
+        self.last_dir = "down"
 
         self.anim_state = "attack"
         self.frame_index = 0
