@@ -53,32 +53,32 @@ class BossEnemy(BaseEnemy):
         self.walk_up = [4,5,6,7]
         self.walk_right = [8,9,10,11]
         self.walk_left = [12,13,14,15]
+        self.attack_left = [18, 19]
+        self.attack_right = [20, 21]
+        self.attack_up = [22, 23]
+        self.attack_down = [16, 17]
 
-    def update_animation(self, delta_time: float) -> None:
-        moving = abs(self.change_x) > 0.1 or abs(self.change_y) > 0.1
-        if moving:
-            if abs(self.change_x) > abs(self.change_y):
-                if self.change_x > 0:
-                    current_frames = self.walk_right
-                else:
-                    current_frames = self.walk_left
+    def attack_animation(self, event: EntityAttackedMeleeEvent):
+        # Filtro para que solo ataquen los que realmente han atacado
+        if event.attacker is not self:
+            return
+
+        direction = event.attack_dir
+
+        if abs(direction.x) > abs(direction.y):
+            if direction.x > 0:
+                self.last_dir = "right"
             else:
-                if self.change_y > 0:
-                    current_frames = self.walk_up
-                else:
-                    current_frames = self.walk_down
-
-            self.anim_time += delta_time
-
-            while self.anim_time >= self.anim_fps:
-                self.anim_time -= self.anim_fps
-                self.frame_index = (self.frame_index + 1) % len(current_frames)
-
-            self.texture = self.textures[current_frames[self.frame_index]]
+                self.last_dir = "left"
         else:
-            self.anim_time = 0
-            self.frame_index = 0
-            self.texture = self.textures[self.frame_index]
+            if direction.y > 0:
+                self.last_dir = "up"
+            else:
+                self.last_dir = "down"
+
+        self.anim_state = "attack"
+        self.frame_index = 0
+        self.anim_time = 0.0
 
     def _follow_path(self) -> None:
         # Ignora los muros y el A* pathfinding.

@@ -56,6 +56,7 @@ class BaseEnemy(BaseEntity, ABC):
     def _setup_animation(self): ...
 
     def update_animation(self, delta_time: float):
+        moving = abs(self.change_x) > 0.1 or abs(self.change_y) > 0.1
         if self.anim_state == "attack":
             if self.last_dir == "right":
                 current_frames = self.attack_right
@@ -79,7 +80,7 @@ class BaseEnemy(BaseEntity, ABC):
             self.texture = self.textures[current_frames[self.frame_index]]
             return
 
-        else:
+        elif self.anim_state == "walk" and moving:
             if abs(self.change_x) > abs(self.change_y):
                 if self.change_x > 0:
                     current_frames = self.walk_right
@@ -90,7 +91,9 @@ class BaseEnemy(BaseEntity, ABC):
                     current_frames = self.walk_up
                 else:
                     current_frames = self.walk_down
-
+        else:
+            self.texture = self.textures[0]
+            return
         self.anim_time += delta_time
         while self.anim_time >= self.anim_fps:
             self.anim_time -= self.anim_fps
@@ -99,6 +102,7 @@ class BaseEnemy(BaseEntity, ABC):
         if self.frame_index >= len(current_frames):
                 self.frame_index = 0
         self.texture = self.textures[current_frames[self.frame_index]]
+
 
 
 
