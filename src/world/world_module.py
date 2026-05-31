@@ -145,11 +145,11 @@ class World:
 
         ### SCENE ###
 
-        self.scene.add_sprite_list_after("player", "Floor")
+        self.scene.add_sprite_list_after("player", "Obstacles")
 
         ### ENEMIGOS ###
 
-        self.scene.add_sprite_list_after("Enemies", "Floor")
+        self.scene.add_sprite_list_after("Enemies", "Obstacles")
         
         ### COMBATE ###
         self.scene.add_sprite_list("Hurtboxes")

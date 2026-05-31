@@ -5,7 +5,7 @@ from entities.enemies.fast_enemy import FastEnemy
 from entities.enemies.ranged_enemy import RangedEnemy
 from services.event_service import EventBus
 from settings.game_resources import GameResources
-from settings.registered_gameplay_events import CoinCollectedEvent, EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityDamagedEvent, EntityFootstepEvent, UIButtonClickEvent, PopupOpenedEvent, GameStartedEvent, ItemBoughtSuccessEvent, PlayMusicEvent
+from settings.registered_gameplay_events import CoinCollectedEvent, EntityAttackedMeleeEvent, EntityAttackedRangedEvent, EntityDamagedEvent, EntityFootstepEvent, GameOverEvent, UIButtonClickEvent, PopupOpenedEvent, GameStartedEvent, ItemBoughtSuccessEvent, PlayMusicEvent
 from entities.player_entity import Player
 
 class AudioService:
@@ -26,7 +26,7 @@ class AudioService:
             
         for path in sound_dir.iterdir():
             if path.is_file() and path.suffix.lower() in ['.wav', '.mp3', '.ogg']:
-                if "music" in path.name.lower() or "soundtrack" in path.name.lower():
+                if "soundtrack" in path.name.lower():
                     continue
                     
                 key = path.stem 
@@ -45,6 +45,7 @@ class AudioService:
         self.event_bus.subscribe(GameStartedEvent, self._on_game_started)
         self.event_bus.subscribe(ItemBoughtSuccessEvent, self._on_item_bought_success)
         self.event_bus.subscribe(PlayMusicEvent, self._on_play_music)
+        self.event_bus.subscribe(GameOverEvent, self._on_game_over)
 
     def _on_melee_attack(self, event: EntityAttackedMeleeEvent):
         if isinstance(event.attacker, BossEnemy):
@@ -60,6 +61,10 @@ class AudioService:
             self.play_random_sound("ranged_dmg", volume=0.6, speed=0.8)
             self.play_random_sound("swipe", volume=0.6)
         
+    def _on_game_over(self, event: GameOverEvent):
+        self.current_music_player.pause()
+        self.current_music_player.delete()
+        self.play_random_sound("gameover", volume=0.7)
 
     def _on_entity_damaged(self, event: EntityDamagedEvent):
         if isinstance(event.entity, Player):
