@@ -7,8 +7,8 @@ Controles:
     - Ataque melee: Clic izquierdo
     - Ataque a distancia: Clic derecho
     - Pausar / Reanudar: Escape
-    - Pantalla completa:F11
-    - Ver hitboxes: (debug)F3
+    - Pantalla completa: F11
+    - Ver hitboxes: (debug) F3
     - Abrir tienda (debug): P
 
 Mecánicas de combate:
