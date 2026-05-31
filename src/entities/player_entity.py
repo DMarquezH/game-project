@@ -15,7 +15,7 @@ class Player(BaseEntity):
 
     DEFAULT_MELEE_RANGE = 64
     DEFAULT_MELEE_AMPLITUDE = 135
-    DEFAULT_MELEE_DAMAGE = 15.0  
+    DEFAULT_MELEE_DAMAGE = 1500.0  
     
     def __init__(self, event_bus: EventBus, sheet: SpriteSheet, scale: float):
         super().__init__(event_bus)
