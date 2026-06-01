@@ -212,12 +212,143 @@ visualizar las hitboxes de todos los elementos de la pantalla, facilitando la ta
 
 ### 2.4 Arquitectura del proyecto
 
+Uno de los principales objetivos técnicos del proyecto fue desarrollar una arquitectura modular que facilitase
+la ampliación del juego y redujese el acoplamiento entre los distintos sistemas. Para ello, se diseñó una
+estructura basada en servicios, sistemas especializados y comunicación mediante eventos.
 
+#### Arquitectura general
 
-## 3. Conclusiones
+La aplicación se divide en varias capas con responsabilidades claramente diferenciadas:
+- Views: encargadas de la presentación visual y de la interacción con el usuario.
+- World: representa el estado global de la partida y actúa como contenedor de las entidades y sistemas activos.
+- Sistemas: componentes especializados que implementan una funcionalidad concreta del juego.
+- Infraestructura: conjunto de servicios compartidos utilizados por el resto de la aplicación.
 
-### 3.1 Resultados obtenidos
+Esta separación permite aislar la lógica de negocio de los aspectos gráficos y facilita la incorporación de
+nuevas funcionalidades sin afectar al resto del proyecto.
 
-### 3.2 Aprendizaje
+#### Infraestructura y servicios
 
-### 3.3 Mejoras futuras
+La infraestructura del proyecto se basa en varios servicios centrales:
+
+##### Contenedor de servicios
+
+Se implementó un contenedor de servicios responsable de la creación y distribución de dependencias entre los
+distintos componentes de la aplicación.
+
+Este enfoque reduce el acoplamiento entre clases y simplifica la construcción de objetos complejos.
+
+##### Bus de eventos
+
+La comunicación entre gran parte de los sistemas se realiza mediante un bus de eventos.
+
+Los distintos componentes pueden publicar eventos o suscribirse a ellos sin necesidad de conocer directamente
+qué otros componentes participan en la operación.
+
+Este mecanismo se utiliza extensivamente en acciones como:
+- Input de usuario.
+- Combate.
+- Movimiento de entidades.
+- Reproducción de sonidos.
+- Eventos de juego.
+
+Gracias a este enfoque, los sistemas permanecen desacoplados y resulta sencillo añadir nuevas reacciones
+a eventos existentes.
+
+##### Gestor de recursos
+
+Se desarrolló un servicio encargado de la carga e inicialización de recursos compartidos como:
+- Texturas
+- Sonidos
+- Fuentes
+- Mapas
+- Objetos
+
+De esta forma se centraliza la gestión de recursos y se evita la duplicación de cargas durante la ejecución.
+
+##### Navegación entre vistas
+
+La transición entre pantallas del juego se realiza mediante un servicio específico de navegación.
+
+Este servicio abstrae la creación de vistas y permite resolver automáticamente sus dependencias utilizando
+el contenedor de servicios.
+
+##### Servicio de entrada (Input Service)
+
+El sistema de entrada fue diseñado para desacoplar los dispositivos físicos de las acciones del juego.
+
+El flujo de procesamiento es el siguiente:
+1) La vista recibe la entrada bruta del usuario.
+2) La entrada se transforma en un modelo de entrada común.
+3) El servicio de entrada procesa dicha información.
+4) Se evalúan los bindings configurados para el contexto activo.
+5) Se generan las acciones correspondientes.
+6) Las acciones producen eventos que son enviados al bus de eventos.
+
+Además, se implementó un sistema de contextos de entrada que permite activar distintos conjuntos de bindings
+dependiendo del estado del juego (partida, menús, tienda, etc.).
+
+Este diseño simplifica la gestión de controles y facilita futuras ampliaciones o cambios de configuración.
+
+Nota para el profesor: Se recomienda la inspección del código del servicio de inputs (.../src/services/input/),
+pues considero que es una pieza muy pulida y destacable de nuestro proyecto, que ha llevado algo de tiempo
+perfeccionar para un uso sencillo y práctico. En el mismo directorio de los documentos del proyecto se incluye
+uno de guía para el servicio de inputs que yo mismo redacté para mis compañeros de grupo.
+
+##### Organización de la lógica de juego
+
+La lógica principal de la partida se encuentra separada de la representación visual.
+
+La vista principal se encarga únicamente de:
+- Renderizar los elementos del juego.
+- Capturar entradas del usuario.
+- Coordinar la actualización visual.
+- Gestionar UIs.
+
+La clase World representa el estado de la partida y contiene:
+- Entidades activas.
+- Sistemas en funcionamiento.
+- Datos globales del juego.
+
+Actúa como punto central de coordinación de la lógica de juego.
+
+##### Sistemas especializados
+
+Las distintas mecánicas se implementan mediante sistemas independientes registrados en World.
+
+Algunos ejemplos son:
+- Sistema de movimiento
+- Sistema de combate
+- Sistema de oleadas
+- Sistema de estadísticas
+- Sistema de generación de enemigos
+
+Cada sistema es responsable exclusivamente de su área funcional, favoreciendo la separación de responsabilidades
+y la reutilización de código.
+
+##### Modelo de entidades
+
+Las entidades del juego siguen una jerarquía de herencia basada en una entidad base común.
+
+A partir de esta entidad se derivan las distintas especializaciones: Player, Enemigos, Proyectiles, Pickups, entre
+otros.
+
+La entidad base proporciona funcionalidades compartidas mientras que las clases derivadas implementan el
+comportamiento específico de cada tipo de objeto.
+
+##### Ventajas de la arquitectura
+
+Las principales ventajas de esta arquitectura han sido:
+- Reducción del acoplamiento entre componentes.
+- Mayor facilidad para añadir nuevas mecánicas.
+- Reutilización de código entre entidades y sistemas.
+- Separación clara entre lógica y presentación.
+- Mayor mantenibilidad del proyecto.
+- Facilidad para realizar pruebas y depuración.
+
+La utilización intensiva del bus de eventos y de servicios compartidos ha permitido mantener una estructura
+flexible incluso a medida que aumentaba la complejidad del proyecto.
+
+Como conclusión opino que aunque diseñar una base sólida y escalable puede requerir de más tiempo (a veces mucho más),
+merece mucho la pena en el futuro si dicha base se ha diseñado bien, pues permite que el flujo de trabajo se
+acelere considerablemente.
