@@ -352,3 +352,28 @@ flexible incluso a medida que aumentaba la complejidad del proyecto.
 Como conclusión opino que aunque diseñar una base sólida y escalable puede requerir de más tiempo (a veces mucho más),
 merece mucho la pena en el futuro si dicha base se ha diseñado bien, pues permite que el flujo de trabajo se
 acelere considerablemente.
+
+## 3. Conclusiones
+
+El desarrollo de Corpse Brigade ha permitido completar un videojuego funcional del género survivor, implementando
+las mecánicas principales definidas durante la fase de diseño. La versión final incluye un sistema de combate cuerpo
+a cuerpo y a distancia, progresión mediante mejoras, generación de oleadas con dificultad creciente y varios tipos
+de enemigos, proporcionando una experiencia de juego completa y jugable.
+
+Durante el desarrollo fue necesario ajustar el alcance inicialmente planteado. Algunas características previstas,
+como los sistemas de construcción, recolección de recursos o la existencia de múltiples escenarios, fueron descartadas
+o simplificadas debido a las limitaciones de tiempo disponibles para el proyecto. Esta decisión permitió concentrar
+los esfuerzos en finalizar correctamente las mecánicas principales y mejorar la estabilidad general del juego.
+
+Desde el punto de vista técnico, uno de los resultados más relevantes ha sido la construcción de una arquitectura
+modular basada en servicios, sistemas especializados y comunicación mediante eventos. Esta estructura ha facilitado
+la organización del código, la separación de responsabilidades y la incorporación de nuevas funcionalidades durante
+el desarrollo. Asimismo, proporciona una base sólida para futuras ampliaciones del proyecto.
+
+En conjunto, el proyecto ha cumplido los objetivos fundamentales establecidos para la asignatura, permitiendo
+aplicar conocimientos relacionados con programación orientada a objetos, diseño de arquitecturas software,
+gestión de eventos, desarrollo de videojuegos (aplicando conceptos aprendidos en clase) y trabajo colaborativo.
+
+Como posibles líneas de trabajo futuro, la arquitectura desarrollada permitiría incorporar con relativa facilidad
+nuevas mecánicas, enemigos, escenarios, objetos, modos de juego o sistemas de progresión más complejos, ampliando
+significativamente el contenido del juego sin necesidad de rediseñar su estructura principal.
