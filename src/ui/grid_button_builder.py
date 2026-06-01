@@ -23,7 +23,7 @@ class GridButtons(arcade.gui.UIAnchorLayout):
 
 
     """
-    def __init__(self, button_list:list[dict], background:Path=None, space_between:int=0, position_x="center", position_y="center", event_bus: EventBus = None):
+    def __init__(self, button_list:list[dict], background:Path=None, space_between:int=0, position_x="center", position_y="center", event_bus: EventBus = None,scale=1):
         super().__init__()
         box_layout = arcade.gui.UIBoxLayout(space_between=space_between)
         for button in button_list:
@@ -34,7 +34,8 @@ class GridButtons(arcade.gui.UIAnchorLayout):
                 image_width=button.get("width",0),
                 image_height=button.get("height",0),
                 columns=button.get("columns",0),
-                count=button.get("count",0)
+                count=button.get("count",0),
+                scale=scale
             )
             box_layout.add(boton)
         if background:
