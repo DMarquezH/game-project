@@ -189,6 +189,6 @@ class BaseEnemy(BaseEntity, ABC):
         elif level == 3:
             self.color = arcade.color.PURPLE
         elif level == 4:
-            self.color = arcade.color.SILVER
+            self.color = arcade.color.LIGHT_BLUE
         elif level >= 5:
             self.color = arcade.color.GOLD

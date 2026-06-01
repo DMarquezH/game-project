@@ -8,10 +8,6 @@
 - Tecnologías: Python + Arcade
 - Versión GDD: 0.1
 
-## Glosario
-
-- Incremental: ...
-
 ## Concepto
 
 Ideas principales resumidas de forma breve.
@@ -331,14 +327,6 @@ Lista inicial de funcionalidades:
 - Estadísticas del jugador: Vida, daño, velocidad de movimiento, velocidad de ataque.
 - Armas (distancia y melee) con atributos propios: Melee[alcance, daño], Distancia[velocidad proyectil,
   tamaño proyectil, daño proyectil, alcance]
-
-
-## Ideas y sugerencias
-
-Lista de ideas y sugerencias:
-- ...
-- ...
-
 
 
 ## Borrador (primera sesión de clase):

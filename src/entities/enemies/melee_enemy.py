@@ -29,7 +29,7 @@ class MeleeEnemy(BaseEnemy):
         self.stats.set(StatDefinition.MAX_HEALTH, health)
         self.stats.set(StatDefinition.HEALTH, health)
         self.stats.set(StatDefinition.ATTACK_DAMAGE, damage)
-        self.stats.set(StatDefinition.ATTACK_SPEED, 1.0) # 1 ataque por segundo
+        self.stats.set(StatDefinition.ATTACK_SPEED, 2.0) # 1 ataque por segundo
         self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64.0)
 
     def _setup_texture(self) -> None:

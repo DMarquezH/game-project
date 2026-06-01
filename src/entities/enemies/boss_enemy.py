@@ -36,7 +36,7 @@ class BossEnemy(BaseEnemy):
         self.stats.set(StatDefinition.MAX_HEALTH, health)
         self.stats.set(StatDefinition.HEALTH, health)
         self.stats.set(StatDefinition.ATTACK_DAMAGE, damage)
-        self.stats.set(StatDefinition.ATTACK_SPEED, 0.5) 
+        self.stats.set(StatDefinition.ATTACK_SPEED, 1)
         self.stats.set(StatDefinition.ATTACK_KNOCKBACK, 64*3)
 
     def _setup_texture(self) -> None:

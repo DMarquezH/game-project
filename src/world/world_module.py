@@ -213,7 +213,9 @@ class World:
         if phase_round == 10:
             # Boss round
             entries.append(EnemySpawnEntry(BossEnemy, 1, level=enemy_level))
-            entries.append(EnemySpawnEntry(RangedEnemy, base_count // 4, level=enemy_level))
+            entries.append(EnemySpawnEntry(RangedEnemy, base_count // 2, level=enemy_level + 1))
+            entries.append(EnemySpawnEntry(FastEnemy, base_count // 3, level=enemy_level + 1))
+            entries.append(EnemySpawnEntry(MeleeEnemy, base_count // 4, level=enemy_level + 1))
         elif phase_round <= 3:
             entries.append(EnemySpawnEntry(MeleeEnemy, total_melee_equivalent, level=enemy_level))
             entries.append(EnemySpawnEntry(RangedEnemy, base_ranged_count, level=enemy_level))
@@ -248,7 +250,8 @@ class World:
                     entries.append(EnemySpawnEntry(RangedEnemy, advanced_ranged, level=enemy_level + 1))
             
         wave = WaveDefinition(entries=entries, spawn_interval=spawn_interval)
-        wave.enemy_level = enemy_level 
+        wave.enemy_level = enemy_level
+
         return wave
 
     def _subscribe_events(self):
@@ -295,7 +298,7 @@ class World:
             from entities.combat.pickup_entity import CoinPickupEntity, HeartPickupEntity
             
 
-            num_coins = random.randint(3, 8)
+            num_coins = random.randint(3, 9)
             for _ in range(num_coins):
                 vel = Vec2(random.uniform(-4, 4), random.uniform(2, 6))
                 coin = CoinPickupEntity((event.entity.center_x, event.entity.center_y), vel)
@@ -416,7 +419,7 @@ class World:
             self.coins -= price
             self.player.stats.increase(EntityStats.resolve(item.stat), item.value)
             if item.stat == StatDefinition.MAX_HEALTH:
-                self.player.stats.increase(StatDefinition.HEALTH, 25)
+                self.player.stats.increase(StatDefinition.HEALTH, 50)
             from settings.registered_gameplay_events import ItemBoughtSuccessEvent
             self.event_bus.dispatch(ItemBoughtSuccessEvent(item))
             self.event_bus.dispatch(ToggleShopEvent(event.shop))
